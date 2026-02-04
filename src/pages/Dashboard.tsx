@@ -1,4 +1,5 @@
-import { Card, Button, Skeleton } from 'antd';
+import { useState } from 'react';
+import { Card, Button } from 'antd';
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
@@ -8,9 +9,15 @@ import {
   WalletOutlined,
   CreditCardOutlined,
   SwapOutlined,
+  SafetyOutlined,
 } from '@ant-design/icons';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { MainLayout } from '@/components/MainLayout';
+import { TransferModal } from '@/components/TransferModal';
+import { PaymentModal } from '@/components/PaymentModal';
+import { ExchangeModal } from '@/components/ExchangeModal';
+import { CardManagementModal } from '@/components/CardManagementModal';
+import { DepositModal } from '@/components/DepositModal';
 import {
   mockAccounts,
   mockTransactions,
@@ -30,13 +37,20 @@ const Dashboard = () => {
   const monthlyIncome = getMonthlyIncome();
   const monthlyExpense = getMonthlyExpense();
 
+  // Modal states
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [exchangeOpen, setExchangeOpen] = useState(false);
+  const [cardManageOpen, setCardManageOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
+
   const recentTransactions = mockTransactions.slice(0, 5);
 
   const quickActions = [
-    { icon: SendOutlined, label: 'Перевести', color: 'bg-primary' },
-    { icon: PlusOutlined, label: 'Пополнить', color: 'bg-success' },
-    { icon: QrcodeOutlined, label: 'Оплатить', color: 'bg-warning' },
-    { icon: SwapOutlined, label: 'Обмен', color: 'bg-accent' },
+    { icon: SendOutlined, label: 'Перевести', action: () => setTransferOpen(true) },
+    { icon: QrcodeOutlined, label: 'Оплатить', action: () => setPaymentOpen(true) },
+    { icon: SwapOutlined, label: 'Обмен', action: () => setExchangeOpen(true) },
+    { icon: SafetyOutlined, label: 'Вклад', action: () => setDepositOpen(true) },
   ];
 
   return (
@@ -49,8 +63,8 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Обзор ваших финансов</p>
           </div>
           <div className="flex gap-2">
-            <Button type="primary" icon={<PlusOutlined />}>
-              Новый счёт
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCardManageOpen(true)}>
+              Новая карта
             </Button>
           </div>
         </div>
@@ -90,6 +104,7 @@ const Dashboard = () => {
               {quickActions.map((action, index) => (
                 <button
                   key={index}
+                  onClick={action.action}
                   className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors min-w-[70px]"
                 >
                   <action.icon className="text-xl" />
@@ -241,6 +256,17 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
+
+      {/* Modals */}
+      <TransferModal open={transferOpen} onClose={() => setTransferOpen(false)} />
+      <PaymentModal open={paymentOpen} onClose={() => setPaymentOpen(false)} />
+      <ExchangeModal open={exchangeOpen} onClose={() => setExchangeOpen(false)} />
+      <CardManagementModal 
+        open={cardManageOpen} 
+        onClose={() => setCardManageOpen(false)} 
+        account={null}
+      />
+      <DepositModal open={depositOpen} onClose={() => setDepositOpen(false)} />
     </MainLayout>
   );
 };

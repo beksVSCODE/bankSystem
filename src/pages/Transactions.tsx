@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card, Table, Tag, DatePicker, Select, Button, Input, Segmented } from 'antd';
+import { Card, Table, Tag, DatePicker, Select, Button, Input, Segmented, message } from 'antd';
 import {
   SearchOutlined,
   FilterOutlined,
@@ -8,6 +8,7 @@ import {
   ArrowDownOutlined,
 } from '@ant-design/icons';
 import { MainLayout } from '@/components/MainLayout';
+import { TransactionDetailModal } from '@/components/TransactionDetailModal';
 import { mockTransactions, mockAccounts, categoryInfo, formatCurrency, formatDate } from '@/mock/data';
 import type { Transaction, TransactionCategory } from '@/mock/types';
 import dayjs from 'dayjs';
@@ -23,6 +24,8 @@ const Transactions = () => {
   const [categoryFilter, setCategoryFilter] = useState<TransactionCategory | 'all'>('all');
   const [accountFilter, setAccountFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const filteredTransactions = useMemo(() => {
     return mockTransactions.filter(tx => {
@@ -60,6 +63,10 @@ const Transactions = () => {
   const totalExpense = filteredTransactions
     .filter(tx => tx.type === 'expense')
     .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+  const handleExport = () => {
+    message.success('Экспорт операций начат. Файл будет скачан автоматически.');
+  };
 
   const columns = [
     {
@@ -195,7 +202,7 @@ const Transactions = () => {
             <h1 className="text-2xl font-bold text-foreground">История операций</h1>
             <p className="text-muted-foreground">Просмотр и фильтрация транзакций</p>
           </div>
-          <Button icon={<DownloadOutlined />}>
+          <Button icon={<DownloadOutlined />} onClick={handleExport}>
             Экспорт
           </Button>
         </div>
@@ -285,9 +292,23 @@ const Transactions = () => {
             }}
             className="bank-table"
             scroll={{ x: 900 }}
+            onRow={(record) => ({
+              onClick: () => {
+                setSelectedTransaction(record);
+                setDetailOpen(true);
+              },
+              className: 'cursor-pointer',
+            })}
           />
         </Card>
       </div>
+
+      {/* Transaction Detail Modal */}
+      <TransactionDetailModal
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        transaction={selectedTransaction}
+      />
     </MainLayout>
   );
 };
