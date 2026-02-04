@@ -1,4 +1,6 @@
-import { Card, Button, Table, Tag, Modal, Form, Input, Select, message } from 'antd';
+import { useState } from 'react';
+import { Card, Button, Table, Tag, message, Dropdown } from 'antd';
+import type { MenuProps } from 'antd';
 import {
   CreditCardOutlined,
   WalletOutlined,
@@ -9,16 +11,24 @@ import {
   EyeInvisibleOutlined,
   CopyOutlined,
   MoreOutlined,
+  SendOutlined,
+  SwapOutlined,
+  LockOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { MainLayout } from '@/components/MainLayout';
+import { TransferModal } from '@/components/TransferModal';
+import { ExchangeModal } from '@/components/ExchangeModal';
+import { CardManagementModal } from '@/components/CardManagementModal';
 import { mockAccounts, formatCurrency } from '@/mock/data';
-import { useState } from 'react';
 import type { Account } from '@/mock/types';
 
 const Accounts = () => {
   const [showBalances, setShowBalances] = useState(true);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [exchangeOpen, setExchangeOpen] = useState(false);
+  const [cardManageOpen, setCardManageOpen] = useState(false);
 
   const getAccountIcon = (type: Account['type']) => {
     switch (type) {
@@ -52,6 +62,51 @@ const Accounts = () => {
     navigator.clipboard.writeText(text);
     message.success('Скопировано в буфер обмена');
   };
+
+  const getDropdownItems = (record: Account): MenuProps['items'] => [
+    {
+      key: 'transfer',
+      icon: <SendOutlined />,
+      label: 'Перевести',
+      onClick: () => {
+        setSelectedAccount(record);
+        setTransferOpen(true);
+      },
+    },
+    {
+      key: 'exchange',
+      icon: <SwapOutlined />,
+      label: 'Обмен валюты',
+      onClick: () => setExchangeOpen(true),
+    },
+    {
+      key: 'copy',
+      icon: <CopyOutlined />,
+      label: 'Копировать номер',
+      onClick: () => copyToClipboard(record.accountNumber),
+    },
+    { type: 'divider' },
+    {
+      key: 'manage',
+      icon: <SettingOutlined />,
+      label: 'Управление картой',
+      onClick: () => {
+        setSelectedAccount(record);
+        setCardManageOpen(true);
+      },
+      disabled: record.type !== 'card',
+    },
+    {
+      key: 'block',
+      icon: <LockOutlined />,
+      label: record.isActive ? 'Заблокировать' : 'Разблокировать',
+      danger: record.isActive,
+      onClick: () => {
+        setSelectedAccount(record);
+        setCardManageOpen(true);
+      },
+    },
+  ];
 
   const columns = [
     {
@@ -111,16 +166,29 @@ const Accounts = () => {
     {
       title: '',
       key: 'actions',
-      width: 50,
+      width: 100,
       render: (_: unknown, record: Account) => (
-        <Button
-          type="text"
-          icon={<MoreOutlined />}
-          onClick={() => {
-            setSelectedAccount(record);
-            setIsModalOpen(true);
-          }}
-        />
+        <div className="flex gap-1">
+          <Button
+            type="primary"
+            size="small"
+            icon={<SendOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedAccount(record);
+              setTransferOpen(true);
+            }}
+          >
+            Перевод
+          </Button>
+          <Dropdown menu={{ items: getDropdownItems(record) }} trigger={['click']}>
+            <Button
+              type="text"
+              icon={<MoreOutlined />}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </Dropdown>
+        </div>
       ),
     },
   ];
@@ -149,14 +217,21 @@ const Accounts = () => {
             >
               {showBalances ? 'Скрыть' : 'Показать'}
             </Button>
-            <Button type="primary" icon={<PlusOutlined />}>
-              Открыть счёт
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setSelectedAccount(null);
+                setCardManageOpen(true);
+              }}
+            >
+              Новая карта
             </Button>
           </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="stats-card" bordered={false}>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -196,6 +271,22 @@ const Accounts = () => {
               </div>
             </div>
           </Card>
+
+          <Card 
+            className="stats-card cursor-pointer hover:border-primary/30 transition-colors" 
+            bordered={false}
+            onClick={() => setExchangeOpen(true)}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+                <SwapOutlined className="text-2xl text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Обмен валюты</p>
+                <p className="text-sm font-medium text-primary">Курсы ЦБ РФ →</p>
+              </div>
+            </div>
+          </Card>
         </div>
 
         {/* Accounts Table */}
@@ -209,73 +300,26 @@ const Accounts = () => {
             onRow={(record) => ({
               onClick: () => {
                 setSelectedAccount(record);
-                setIsModalOpen(true);
+                setCardManageOpen(true);
               },
               className: 'cursor-pointer',
             })}
           />
         </Card>
-
-        {/* Account Details Modal */}
-        <Modal
-          title="Детали счёта"
-          open={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
-          footer={[
-            <Button key="close" onClick={() => setIsModalOpen(false)}>
-              Закрыть
-            </Button>,
-            <Button key="transfer" type="primary">
-              Перевести
-            </Button>,
-          ]}
-          width={500}
-        >
-          {selectedAccount && (
-            <div className="space-y-4 py-4">
-              <div
-                className="p-6 rounded-xl text-white"
-                style={{ background: `linear-gradient(135deg, ${selectedAccount.color} 0%, ${selectedAccount.color}CC 100%)` }}
-              >
-                <p className="text-white/70 text-sm mb-1">{selectedAccount.name}</p>
-                <p className="text-3xl font-bold mb-4">
-                  {formatCurrency(selectedAccount.balance, selectedAccount.currency)}
-                </p>
-                {selectedAccount.cardNumber && (
-                  <p className="text-lg tracking-wider">{selectedAccount.cardNumber}</p>
-                )}
-                {selectedAccount.expiryDate && (
-                  <p className="text-sm text-white/70 mt-2">Действует до: {selectedAccount.expiryDate}</p>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Номер счёта</p>
-                    <p className="font-mono text-sm">{selectedAccount.accountNumber}</p>
-                  </div>
-                  <Button
-                    type="text"
-                    icon={<CopyOutlined />}
-                    onClick={() => copyToClipboard(selectedAccount.accountNumber)}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Тип счёта</p>
-                    <p className="text-sm">{getAccountTypeLabel(selectedAccount.type)}</p>
-                  </div>
-                  <Tag color={selectedAccount.isActive ? 'green' : 'red'}>
-                    {selectedAccount.isActive ? 'Активен' : 'Заблокирован'}
-                  </Tag>
-                </div>
-              </div>
-            </div>
-          )}
-        </Modal>
       </div>
+
+      {/* Modals */}
+      <TransferModal 
+        open={transferOpen} 
+        onClose={() => setTransferOpen(false)} 
+        preselectedAccount={selectedAccount || undefined}
+      />
+      <ExchangeModal open={exchangeOpen} onClose={() => setExchangeOpen(false)} />
+      <CardManagementModal 
+        open={cardManageOpen} 
+        onClose={() => setCardManageOpen(false)} 
+        account={selectedAccount}
+      />
     </MainLayout>
   );
 };
