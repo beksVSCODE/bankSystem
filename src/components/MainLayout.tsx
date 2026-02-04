@@ -26,9 +26,10 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       {isMobile && (
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="fixed top-3 left-3 z-[60] p-2.5 rounded-lg bg-card shadow-lg border border-border lg:hidden"
+          className="fixed top-3 left-3 z-[60] p-2.5 rounded-xl bg-card shadow-lg border border-border lg:hidden transition-all duration-200 active:scale-95 hover:shadow-xl"
+          aria-label="Toggle menu"
         >
-          {isMobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
+          {isMobileMenuOpen ? <CloseOutlined className="text-lg" /> : <MenuOutlined className="text-lg" />}
         </button>
       )}
 
@@ -41,19 +42,21 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       {isMobile && isMobileMenuOpen && (
         <>
           <div 
-            className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-40 animate-fadeIn"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed left-0 top-0 z-50 animate-slide-in">
+          <div className="fixed left-0 top-0 z-50 animate-slideIn">
             <Sidebar onCollapsedChange={setSidebarCollapsed} />
           </div>
         </>
       )}
 
       {/* Main content */}
-      <main className={`transition-all duration-300 ${isMobile ? 'ml-0 pt-14' : sidebarCollapsed ? 'ml-20' : 'ml-64'} min-h-screen`}>
-        <div className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">
-          {children}
+      <main className={`transition-all duration-300 ease-in-out ${isMobile ? 'ml-0 pt-14' : sidebarCollapsed ? 'ml-20' : 'ml-64'} min-h-screen`}>
+        <div className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+          <div className="animate-fadeIn">
+            {children}
+          </div>
         </div>
       </main>
     </div>

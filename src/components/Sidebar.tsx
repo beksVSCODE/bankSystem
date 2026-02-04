@@ -79,38 +79,44 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
     <>
       <aside 
         className={`fixed left-0 top-0 h-full bg-sidebar text-sidebar-foreground transition-all duration-300 z-50 
-          ${collapsed ? 'w-20' : 'w-64'} flex flex-col shadow-xl overflow-y-auto`}
+          ${collapsed ? 'w-20' : 'w-64'} flex flex-col shadow-2xl overflow-y-auto backdrop-blur-sm`}
+        style={{
+          background: 'linear-gradient(180deg, rgba(0, 81, 168, 0.97) 0%, rgba(0, 81, 168, 1) 100%)',
+        }}
       >
+        {/* Decorative gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none"></div>
+        
         {/* Logo */}
-        <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 border-b border-sidebar-border shrink-0">
+        <div className="relative flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/10 flex items-center justify-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center ring-2 ring-white/30 shadow-lg">
               <span className="text-white font-bold text-base sm:text-lg">S</span>
             </div>
             {!collapsed && (
-              <span className="font-semibold text-base sm:text-lg tracking-tight">SovcomBank</span>
+              <span className="font-semibold text-base sm:text-lg tracking-tight animate-fadeIn">SovcomBank</span>
             )}
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-sidebar-accent transition-colors hidden lg:block"
+            className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 active:bg-white/20 transition-all duration-200 hidden lg:block"
           >
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </button>
         </div>
 
         {/* Search Button */}
-        <div className="px-2 sm:px-3 pt-3 sm:pt-4 shrink-0">
+        <div className="relative px-2 sm:px-3 pt-3 sm:pt-4 shrink-0">
           <Tooltip title={collapsed ? 'Поиск (⌘K)' : ''} placement="right">
             <button
               onClick={() => setSearchOpen(true)}
-              className={`nav-link w-full bg-white/5 hover:bg-white/10 text-sm sm:text-base ${collapsed ? 'justify-center' : ''}`}
+              className={`nav-link w-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-sm sm:text-base transition-all duration-200 ${collapsed ? 'justify-center' : ''} backdrop-blur-sm border border-white/20`}
             >
               <SearchOutlined className="text-lg" />
               {!collapsed && (
                 <>
                   <span className="flex-1 text-left text-sm sm:text-base">Поиск...</span>
-                  <kbd className="px-1 sm:px-1.5 py-0.5 rounded bg-white/10 text-[10px] sm:text-xs">⌘K</kbd>
+                  <kbd className="px-1 sm:px-1.5 py-0.5 rounded bg-white/20 text-[10px] sm:text-xs shadow-sm">⌘K</kbd>
                 </>
               )}
             </button>
@@ -118,21 +124,31 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-3 sm:py-4 px-2 sm:px-3 overflow-y-auto">
+        <nav className="relative flex-1 py-3 sm:py-4 px-2 sm:px-3 overflow-y-auto">
           <ul className="space-y-0.5 sm:space-y-1">
-            {navItems.map(item => {
+            {navItems.map((item, index) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               
               return (
-                <li key={item.path}>
+                <li 
+                  key={item.path}
+                  style={{
+                    animation: 'slideIn 0.3s ease-out',
+                    animationDelay: `${index * 50}ms`,
+                    animationFillMode: 'backwards',
+                  }}
+                >
                   <Tooltip title={collapsed ? item.label : ''} placement="right">
                     <NavLink
                       to={item.path}
-                      className={`nav-link text-sm sm:text-base ${isActive ? 'active' : ''}`}
+                      className={`nav-link text-sm sm:text-base group relative ${isActive ? 'active bg-white/20 shadow-md' : 'hover:bg-white/10 active:bg-white/20'} transition-all duration-200`}
                     >
-                      <Icon className="text-base sm:text-lg" />
-                      {!collapsed && <span>{item.label}</span>}
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full shadow-lg"></span>
+                      )}
+                      <Icon className="text-base sm:text-lg transition-transform duration-200 group-hover:scale-110" />
+                      {!collapsed && <span className="transition-transform duration-200">{item.label}</span>}
                     </NavLink>
                   </Tooltip>
                 </li>
@@ -142,10 +158,10 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
         </nav>
 
         {/* Bottom section */}
-        <div className="p-2 sm:p-3 border-t border-sidebar-border space-y-1.5 sm:space-y-2 shrink-0">
+        <div className="relative p-2 sm:p-3 border-t border-white/10 space-y-1.5 sm:space-y-2 shrink-0 backdrop-blur-sm">
           {/* Notifications */}
           <Popover content={notificationContent} title="Уведомления" trigger="click" placement="rightTop">
-            <button className={`nav-link w-full text-sm sm:text-base ${collapsed ? 'justify-center' : ''}`}>
+            <button className={`nav-link w-full text-sm sm:text-base hover:bg-white/10 active:bg-white/20 transition-all duration-200 ${collapsed ? 'justify-center' : ''}`}>
               <Badge count={unreadCount} size="small" offset={[-2, 2]}>
                 <BellOutlined className="text-base sm:text-lg text-sidebar-foreground" />
               </Badge>
@@ -155,8 +171,8 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
 
           {/* User */}
           {!collapsed && (
-            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2">
-              <Avatar size={32} className="bg-white/20 sm:w-9 sm:h-9">
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 rounded-lg backdrop-blur-sm">
+              <Avatar size={32} className="bg-white/30 backdrop-blur-sm sm:w-9 sm:h-9 ring-2 ring-white/40">
                 {mockUser.firstName[0]}{mockUser.lastName[0]}
               </Avatar>
               <div className="flex-1 min-w-0">

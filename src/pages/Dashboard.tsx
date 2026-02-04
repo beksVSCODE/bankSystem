@@ -80,16 +80,26 @@ const Dashboard = () => {
         </div>
 
         {/* Balance Card */}
-        <div className="bank-card text-white">
-          <div className="flex flex-col gap-6">
+        <div className="bank-card text-white relative overflow-hidden group">
+          {/* Animated background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 transition-transform duration-500 group-hover:scale-105"></div>
+          
+          {/* Floating circles decoration */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10 flex flex-col gap-6">
             <div>
-              <p className="text-white/70 text-xs sm:text-sm mb-1">Общий баланс</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
+              <p className="text-white/70 text-xs sm:text-sm mb-1 flex items-center gap-2">
+                Общий баланс
+                <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              </p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 tracking-tight">
                 {formatCurrency(totalBalance)}
               </h2>
               <div className="flex flex-col xs:flex-row gap-4 xs:gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 group/income">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 transition-all group-hover/income:bg-white/30 group-hover/income:scale-110">
                     <ArrowDownOutlined className="text-success-foreground text-sm sm:text-base" />
                   </div>
                   <div>
@@ -97,8 +107,8 @@ const Dashboard = () => {
                     <p className="font-semibold text-sm sm:text-base">{formatCurrency(monthlyIncome)}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 group/expense">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 transition-all group-hover/expense:bg-white/30 group-hover/expense:scale-110">
                     <ArrowUpOutlined className="text-destructive-foreground text-sm sm:text-base" />
                   </div>
                   <div>
@@ -115,10 +125,10 @@ const Dashboard = () => {
                 <button
                   key={index}
                   onClick={action.action}
-                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all duration-200 border border-white/10 hover:border-white/20"
                 >
-                  <action.icon className="text-base sm:text-xl" />
-                  <span className="text-[10px] sm:text-xs leading-tight text-center">{action.label}</span>
+                  <action.icon className="text-base sm:text-xl transition-transform group-hover:scale-110" />
+                  <span className="text-[10px] sm:text-xs leading-tight text-center font-medium">{action.label}</span>
                 </button>
               ))}
             </div>
@@ -134,33 +144,38 @@ const Dashboard = () => {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {accounts.slice(0, 3).map(account => (
+            {accounts.slice(0, 3).map((account, index) => (
               <Card
                 key={account.id}
-                className="stats-card cursor-pointer hover:border-primary/30"
+                className="stats-card cursor-pointer hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 active:scale-98 overflow-hidden group"
                 onClick={() => navigate('/accounts')}
                 bordered={false}
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                }}
               >
-                <div className="flex items-start justify-between mb-2 sm:mb-3">
-                  <div
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: `${account.color}15` }}
-                  >
-                    {account.type === 'card' ? (
-                      <CreditCardOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
-                    ) : (
-                      <WalletOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
-                    )}
+                {/* Shine effect on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <div
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
+                      style={{ backgroundColor: `${account.color}15` }}
+                    >
+                      {account.type === 'card' ? (
+                        <CreditCardOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
+                      ) : (
+                        <WalletOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
+                      )}
+                    </div>
+                    <span className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold tracking-wider">{account.currency}</span>
                   </div>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground uppercase">{account.currency}</span>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">{account.name}</p>
+                  <p className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+                    {formatCurrency(account.balance, account.currency)}
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">{account.name}</p>
-                <p className="text-lg sm:text-xl font-bold text-foreground">
-                  {formatCurrency(account.balance, account.currency)}
-                </p>
-                {account.cardNumber && (
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">{account.cardNumber}</p>
-                )}
               </Card>
             ))}
           </div>
@@ -224,7 +239,7 @@ const Dashboard = () => {
           </Card>
 
           {/* Recent Transactions */}
-          <Card className="border-0 shadow-card" bordered={false}>
+          <Card className="border-0 shadow-card hover:shadow-lg transition-shadow duration-300" bordered={false}>
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <h3 className="text-base sm:text-lg font-semibold text-foreground">Последние операции</h3>
               <Button type="link" onClick={() => navigate('/transactions')} className="p-0 text-xs sm:text-sm">
@@ -232,31 +247,34 @@ const Dashboard = () => {
               </Button>
             </div>
             <div className="space-y-2 sm:space-y-3">
-              {recentTransactions.map(tx => {
+              {recentTransactions.map((tx, index) => {
                 const catInfo = categoryInfo[tx.category];
                 return (
                   <div
                     key={tx.id}
-                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-all duration-200 cursor-pointer group"
                     onClick={() => navigate('/transactions')}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                    }}
                   >
                     <div
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
                       style={{ backgroundColor: `${catInfo.color}15` }}
                     >
-                      <span style={{ color: catInfo.color }} className="text-sm sm:text-base">
+                      <span style={{ color: catInfo.color }} className="text-sm sm:text-base transition-transform duration-300 group-hover:rotate-12">
                         {tx.type === 'income' ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm font-medium text-foreground truncate">
+                      <p className="text-xs sm:text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
                         {tx.description}
                       </p>
                       <p className="text-[10px] sm:text-xs text-muted-foreground">
                         {formatShortDate(tx.date)}
                       </p>
                     </div>
-                    <p className={`text-xs sm:text-sm font-semibold whitespace-nowrap ${tx.amount > 0 ? 'amount-positive' : 'amount-negative'}`}>
+                    <p className={`text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${tx.amount > 0 ? 'amount-positive' : 'amount-negative'}`}>
                       {tx.amount > 0 ? '+' : ''}{formatCurrency(tx.amount)}
                     </p>
                   </div>
