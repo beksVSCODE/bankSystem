@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Modal, Form, InputNumber, Select, Button, Card, Spin } from 'antd';
+import { Modal, Form, InputNumber, Select, Button, Card, Spin, message } from 'antd';
 import { SwapOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import { mockAccounts, formatCurrency } from '@/mock/data';
+import { formatCurrency } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 
 interface ExchangeModalProps {
   open: boolean;
@@ -25,6 +26,9 @@ const mockRates: ExchangeRate[] = [
 ];
 
 export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
+  const accounts = useFinancialStore(state => state.accounts);
+  const exchangeCurrency = useFinancialStore(state => state.exchangeCurrency);
+  
   const [loading, setLoading] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [fromCurrency, setFromCurrency] = useState<'RUB' | 'USD' | 'EUR'>('RUB');
@@ -63,10 +67,35 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
   };
 
   const handleExchange = async () => {
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setLoading(false);
-    setSuccess(true);
+    try {
+      await form.validateFields();
+      
+      const values = form.getFieldsValue();
+      if (!values.fromAccount || !values.toAccount || !fromAmount || !toAmount) {
+        return;
+      }
+      
+      setLoading(true);
+      
+      const exchangeSuccess = exchangeCurrency(
+        values.fromAccount,
+        values.toAccount,
+        fromAmount,
+        toAmount
+      );
+      
+      if (!exchangeSuccess) {
+        message.error('Недостаточно средств для обмена');
+        setLoading(false);
+        return;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setLoading(false);
+      setSuccess(true);
+    } catch {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -77,8 +106,8 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
     onClose();
   };
 
-  const fromAccounts = mockAccounts.filter(acc => acc.currency === fromCurrency);
-  const toAccounts = mockAccounts.filter(acc => acc.currency === toCurrency);
+  const fromAccounts = accounts.filter(acc => acc.currency === fromCurrency);
+  const toAccounts = accounts.filter(acc => acc.currency === toCurrency);
 
   const currencySymbols: Record<string, string> = {
     RUB: '₽',

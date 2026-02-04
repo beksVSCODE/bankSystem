@@ -9,6 +9,7 @@ interface MainLayoutProps {
 export const MainLayout = ({ children }: MainLayoutProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -25,7 +26,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       {isMobile && (
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="fixed top-4 left-4 z-[60] p-2 rounded-lg bg-card shadow-lg border border-border lg:hidden"
+          className="fixed top-3 left-3 z-[60] p-2.5 rounded-lg bg-card shadow-lg border border-border lg:hidden"
         >
           {isMobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
         </button>
@@ -33,7 +34,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
 
       {/* Sidebar - Desktop */}
       <div className="hidden lg:block">
-        <Sidebar />
+        <Sidebar onCollapsedChange={setSidebarCollapsed} />
       </div>
 
       {/* Sidebar - Mobile overlay */}
@@ -44,14 +45,14 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             onClick={() => setIsMobileMenuOpen(false)}
           />
           <div className="fixed left-0 top-0 z-50 animate-slide-in">
-            <Sidebar />
+            <Sidebar onCollapsedChange={setSidebarCollapsed} />
           </div>
         </>
       )}
 
       {/* Main content */}
-      <main className={`transition-all duration-300 ${isMobile ? 'ml-0' : 'ml-64'} min-h-screen`}>
-        <div className="p-6 md:p-8 max-w-7xl mx-auto animate-fade-in">
+      <main className={`transition-all duration-300 ${isMobile ? 'ml-0 pt-14' : sidebarCollapsed ? 'ml-20' : 'ml-64'} min-h-screen`}>
+        <div className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">
           {children}
         </div>
       </main>

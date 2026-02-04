@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Modal, Form, Input, Select, Button, Steps, message, InputNumber, Result } from 'antd';
 import { SwapOutlined, UserOutlined, BankOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { mockAccounts, formatCurrency } from '@/mock/data';
+import { formatCurrency } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 import type { Account } from '@/mock/types';
 
 interface TransferModalProps {
@@ -13,6 +14,9 @@ interface TransferModalProps {
 type TransferType = 'between' | 'other' | 'phone';
 
 export const TransferModal = ({ open, onClose, preselectedAccount }: TransferModalProps) => {
+  const accounts = useFinancialStore(state => state.accounts);
+  const transferBetweenAccounts = useFinancialStore(state => state.transferBetweenAccounts);
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [transferType, setTransferType] = useState<TransferType>('between');
   const [loading, setLoading] = useState(false);
@@ -29,8 +33,30 @@ export const TransferModal = ({ open, onClose, preselectedAccount }: TransferMod
       await form.validateFields();
       if (currentStep === 1) {
         setLoading(true);
-        // Simulate transfer
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Perform actual transfer for "between" type
+        if (transferType === 'between') {
+          const values = form.getFieldsValue();
+          const success = transferBetweenAccounts(
+            values.fromAccount,
+            values.toAccount,
+            values.amount,
+            values.description || 'Перевод между счетами'
+          );
+          
+          if (!success) {
+            message.error('Недостаточно средств для перевода');
+            setLoading(false);
+            return;
+          }
+          
+          message.success('Перевод выполнен успешно!');
+        } else {
+          // Simulate transfer for other types (not implemented with real accounts)
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          message.success('Перевод выполнен успешно!');
+        }
+        
         setLoading(false);
         setCurrentStep(2);
       } else {
@@ -47,7 +73,7 @@ export const TransferModal = ({ open, onClose, preselectedAccount }: TransferMod
     { value: 'phone', label: 'По номеру телефона', icon: <BankOutlined /> },
   ];
 
-  const accountOptions = mockAccounts.map(acc => ({
+  const accountOptions = accounts.map(acc => ({
     value: acc.id,
     label: (
       <div className="flex justify-between items-center">
@@ -106,7 +132,7 @@ export const TransferModal = ({ open, onClose, preselectedAccount }: TransferMod
           form={form}
           layout="vertical"
           initialValues={{
-            fromAccount: preselectedAccount?.id || mockAccounts[0]?.id,
+            fromAccount: preselectedAccount?.id || accounts[0]?.id,
           }}
         >
           <Form.Item

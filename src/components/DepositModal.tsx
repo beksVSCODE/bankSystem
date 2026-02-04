@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { Modal, Form, InputNumber, Select, Button, Card, Steps, Result, Radio, Slider } from 'antd';
+import { Modal, Form, InputNumber, Select, Button, Card, Steps, Result, Radio, Slider, message } from 'antd';
 import {
   SafetyOutlined,
   PercentageOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
 } from '@ant-design/icons';
-import { mockAccounts, formatCurrency } from '@/mock/data';
+import { formatCurrency } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 
 interface DepositModalProps {
   open: boolean;
@@ -54,6 +55,9 @@ const depositProducts: DepositProduct[] = [
 ];
 
 export const DepositModal = ({ open, onClose }: DepositModalProps) => {
+  const accounts = useFinancialStore(state => state.accounts);
+  const openDeposit = useFinancialStore(state => state.openDeposit);
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<DepositProduct | null>(null);
   const [loading, setLoading] = useState(false);
@@ -73,8 +77,28 @@ export const DepositModal = ({ open, onClose }: DepositModalProps) => {
   const handleOpenDeposit = async () => {
     try {
       await form.validateFields();
+      
+      if (!selectedProduct) return;
+      
+      const values = form.getFieldsValue();
+      
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const success = openDeposit(
+        values.fromAccount,
+        amount,
+        `Вклад "${selectedProduct.name}"`,
+        selectedProduct.rate
+      );
+      
+      if (!success) {
+        message.error('Недостаточно средств для открытия вклада');
+        setLoading(false);
+        return;
+      }
+      
+      message.success('Вклад успешно открыт!');
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setLoading(false);
       setCurrentStep(2);
     } catch {
@@ -89,7 +113,7 @@ export const DepositModal = ({ open, onClose }: DepositModalProps) => {
     return Math.round(income);
   };
 
-  const accountOptions = mockAccounts
+  const accountOptions = accounts
     .filter(acc => acc.currency === 'RUB' && acc.type !== 'deposit')
     .map(acc => ({
       value: acc.id,

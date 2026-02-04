@@ -9,7 +9,8 @@ import {
 } from '@ant-design/icons';
 import { MainLayout } from '@/components/MainLayout';
 import { TransactionDetailModal } from '@/components/TransactionDetailModal';
-import { mockTransactions, mockAccounts, categoryInfo, formatCurrency, formatDate } from '@/mock/data';
+import { categoryInfo, formatCurrency, formatDate } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 import type { Transaction, TransactionCategory } from '@/mock/types';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
@@ -19,6 +20,9 @@ dayjs.locale('ru');
 const { RangePicker } = DatePicker;
 
 const Transactions = () => {
+  const transactions = useFinancialStore(state => state.transactions);
+  const accounts = useFinancialStore(state => state.accounts);
+  
   const [searchText, setSearchText] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
   const [categoryFilter, setCategoryFilter] = useState<TransactionCategory | 'all'>('all');
@@ -28,7 +32,7 @@ const Transactions = () => {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const filteredTransactions = useMemo(() => {
-    return mockTransactions.filter(tx => {
+    return transactions.filter(tx => {
       // Text search
       if (searchText && !tx.description.toLowerCase().includes(searchText.toLowerCase())) {
         return false;
@@ -127,7 +131,7 @@ const Transactions = () => {
       key: 'accountId',
       width: 160,
       render: (accountId: string) => {
-        const account = mockAccounts.find(acc => acc.id === accountId);
+        const account = accounts.find(acc => acc.id === accountId);
         return account ? (
           <span className="text-muted-foreground">{account.name}</span>
         ) : null;
@@ -177,7 +181,7 @@ const Transactions = () => {
 
   const accountOptions = [
     { value: 'all', label: 'Все счета' },
-    ...mockAccounts.map(acc => ({
+    ...accounts.map(acc => ({
       value: acc.id,
       label: acc.name,
     })),

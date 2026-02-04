@@ -10,7 +10,8 @@ import {
   CheckCircleOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
-import { mockAccounts, formatCurrency } from '@/mock/data';
+import { formatCurrency } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 
 interface PaymentModalProps {
   open: boolean;
@@ -51,6 +52,9 @@ const providers: Record<PaymentCategory, string[]> = {
 };
 
 export const PaymentModal = ({ open, onClose }: PaymentModalProps) => {
+  const accounts = useFinancialStore(state => state.accounts);
+  const makePayment = useFinancialStore(state => state.makePayment);
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<PaymentCategory | null>(null);
   const [loading, setLoading] = useState(false);
@@ -67,7 +71,31 @@ export const PaymentModal = ({ open, onClose }: PaymentModalProps) => {
     try {
       await form.validateFields();
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const values = form.getFieldsValue();
+      const categoryMap: Record<PaymentCategory, any> = {
+        mobile: 'other',
+        utilities: 'utilities',
+        internet: 'other',
+        transport: 'transport',
+        other: 'other',
+      };
+      
+      const success = makePayment(
+        values.account,
+        values.amount,
+        `${values.provider} - ${values.accountNumber}`,
+        categoryMap[selectedCategory as PaymentCategory],
+        values.provider
+      );
+      
+      if (!success) {
+        message.error('Недостаточно средств для оплаты');
+        setLoading(false);
+        return;
+      }
+      
+      message.success('Платёж выполнен успешно!');
       setLoading(false);
       setCurrentStep(2);
     } catch {
@@ -85,7 +113,7 @@ export const PaymentModal = ({ open, onClose }: PaymentModalProps) => {
     setCurrentStep(1);
   };
 
-  const accountOptions = mockAccounts
+  const accountOptions = accounts
     .filter(acc => acc.currency === 'RUB')
     .map(acc => ({
       value: acc.id,

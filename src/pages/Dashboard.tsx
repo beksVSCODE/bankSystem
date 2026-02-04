@@ -18,9 +18,8 @@ import { PaymentModal } from '@/components/PaymentModal';
 import { ExchangeModal } from '@/components/ExchangeModal';
 import { CardManagementModal } from '@/components/CardManagementModal';
 import { DepositModal } from '@/components/DepositModal';
+import { DataManagement } from '@/components/DataManagement';
 import {
-  mockAccounts,
-  mockTransactions,
   mockMonthlyAnalytics,
   formatCurrency,
   formatShortDate,
@@ -29,13 +28,17 @@ import {
   getMonthlyExpense,
   categoryInfo,
 } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const totalBalance = getTotalBalance();
-  const monthlyIncome = getMonthlyIncome();
-  const monthlyExpense = getMonthlyExpense();
+  const accounts = useFinancialStore(state => state.accounts);
+  const transactions = useFinancialStore(state => state.transactions);
+  
+  const totalBalance = getTotalBalance(accounts);
+  const monthlyIncome = getMonthlyIncome(transactions);
+  const monthlyExpense = getMonthlyExpense(transactions);
 
   // Modal states
   const [transferOpen, setTransferOpen] = useState(false);
@@ -44,7 +47,7 @@ const Dashboard = () => {
   const [cardManageOpen, setCardManageOpen] = useState(false);
   const [depositOpen, setDepositOpen] = useState(false);
 
-  const recentTransactions = mockTransactions.slice(0, 5);
+  const recentTransactions = transactions.slice(0, 5);
 
   const quickActions = [
     { icon: SendOutlined, label: 'Перевести', action: () => setTransferOpen(true) },
@@ -55,60 +58,67 @@ const Dashboard = () => {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Добро пожаловать!</h1>
-            <p className="text-muted-foreground">Обзор ваших финансов</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Добро пожаловать!</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Обзор ваших финансов</p>
           </div>
           <div className="flex gap-2">
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCardManageOpen(true)}>
-              Новая карта
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />} 
+              onClick={() => setCardManageOpen(true)}
+              size="middle"
+              className="w-full sm:w-auto"
+            >
+              <span className="hidden sm:inline">Новая карта</span>
+              <span className="sm:hidden">Карта</span>
             </Button>
           </div>
         </div>
 
         {/* Balance Card */}
         <div className="bank-card text-white">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex flex-col gap-6">
             <div>
-              <p className="text-white/70 text-sm mb-1">Общий баланс</p>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <p className="text-white/70 text-xs sm:text-sm mb-1">Общий баланс</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
                 {formatCurrency(totalBalance)}
               </h2>
-              <div className="flex gap-6">
+              <div className="flex flex-col xs:flex-row gap-4 xs:gap-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                    <ArrowDownOutlined className="text-success-foreground" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <ArrowDownOutlined className="text-success-foreground text-sm sm:text-base" />
                   </div>
                   <div>
                     <p className="text-white/70 text-xs">Доходы</p>
-                    <p className="font-semibold">{formatCurrency(monthlyIncome)}</p>
+                    <p className="font-semibold text-sm sm:text-base">{formatCurrency(monthlyIncome)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                    <ArrowUpOutlined className="text-destructive-foreground" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <ArrowUpOutlined className="text-destructive-foreground text-sm sm:text-base" />
                   </div>
                   <div>
                     <p className="text-white/70 text-xs">Расходы</p>
-                    <p className="font-semibold">{formatCurrency(monthlyExpense)}</p>
+                    <p className="font-semibold text-sm sm:text-base">{formatCurrency(monthlyExpense)}</p>
                   </div>
                 </div>
               </div>
             </div>
             
             {/* Quick Actions */}
-            <div className="flex gap-3">
+            <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-3">
               {quickActions.map((action, index) => (
                 <button
                   key={index}
                   onClick={action.action}
-                  className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors min-w-[70px]"
+                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
                 >
-                  <action.icon className="text-xl" />
-                  <span className="text-xs">{action.label}</span>
+                  <action.icon className="text-base sm:text-xl" />
+                  <span className="text-[10px] sm:text-xs leading-tight text-center">{action.label}</span>
                 </button>
               ))}
             </div>
@@ -117,39 +127,39 @@ const Dashboard = () => {
 
         {/* Accounts Grid */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Мои счета</h3>
-            <Button type="link" onClick={() => navigate('/accounts')} className="p-0">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">Мои счета</h3>
+            <Button type="link" onClick={() => navigate('/accounts')} className="p-0 text-xs sm:text-sm">
               Все счета →
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockAccounts.slice(0, 3).map(account => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {accounts.slice(0, 3).map(account => (
               <Card
                 key={account.id}
                 className="stats-card cursor-pointer hover:border-primary/30"
                 onClick={() => navigate('/accounts')}
                 bordered={false}
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-2 sm:mb-3">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0"
                     style={{ backgroundColor: `${account.color}15` }}
                   >
                     {account.type === 'card' ? (
-                      <CreditCardOutlined style={{ color: account.color, fontSize: 20 }} />
+                      <CreditCardOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
                     ) : (
-                      <WalletOutlined style={{ color: account.color, fontSize: 20 }} />
+                      <WalletOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground uppercase">{account.currency}</span>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground uppercase">{account.currency}</span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-1">{account.name}</p>
-                <p className="text-xl font-bold text-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">{account.name}</p>
+                <p className="text-lg sm:text-xl font-bold text-foreground">
                   {formatCurrency(account.balance, account.currency)}
                 </p>
                 {account.cardNumber && (
-                  <p className="text-xs text-muted-foreground mt-2">{account.cardNumber}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">{account.cardNumber}</p>
                 )}
               </Card>
             ))}
@@ -157,16 +167,16 @@ const Dashboard = () => {
         </div>
 
         {/* Chart and Recent Transactions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Chart */}
           <Card className="lg:col-span-2 border-0 shadow-card" bordered={false}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-foreground">Статистика</h3>
-              <Button type="link" onClick={() => navigate('/analytics')} className="p-0">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">Статистика</h3>
+              <Button type="link" onClick={() => navigate('/analytics')} className="p-0 text-xs sm:text-sm">
                 Подробнее →
               </Button>
             </div>
-            <div className="h-64">
+            <div className="h-48 sm:h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={mockMonthlyAnalytics}>
                   <defs>
@@ -215,38 +225,38 @@ const Dashboard = () => {
 
           {/* Recent Transactions */}
           <Card className="border-0 shadow-card" bordered={false}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-foreground">Последние операции</h3>
-              <Button type="link" onClick={() => navigate('/transactions')} className="p-0">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">Последние операции</h3>
+              <Button type="link" onClick={() => navigate('/transactions')} className="p-0 text-xs sm:text-sm">
                 Все →
               </Button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {recentTransactions.map(tx => {
                 const catInfo = categoryInfo[tx.category];
                 return (
                   <div
                     key={tx.id}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                     onClick={() => navigate('/transactions')}
                   >
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0"
                       style={{ backgroundColor: `${catInfo.color}15` }}
                     >
-                      <span style={{ color: catInfo.color }}>
+                      <span style={{ color: catInfo.color }} className="text-sm sm:text-base">
                         {tx.type === 'income' ? <ArrowDownOutlined /> : <ArrowUpOutlined />}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
+                      <p className="text-xs sm:text-sm font-medium text-foreground truncate">
                         {tx.description}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
                         {formatShortDate(tx.date)}
                       </p>
                     </div>
-                    <p className={`text-sm font-semibold ${tx.amount > 0 ? 'amount-positive' : 'amount-negative'}`}>
+                    <p className={`text-xs sm:text-sm font-semibold whitespace-nowrap ${tx.amount > 0 ? 'amount-positive' : 'amount-negative'}`}>
                       {tx.amount > 0 ? '+' : ''}{formatCurrency(tx.amount)}
                     </p>
                   </div>
@@ -255,6 +265,9 @@ const Dashboard = () => {
             </div>
           </Card>
         </div>
+
+        {/* Data Management Section */}
+        <DataManagement />
       </div>
 
       {/* Modals */}

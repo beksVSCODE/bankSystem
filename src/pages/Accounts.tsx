@@ -20,10 +20,12 @@ import { MainLayout } from '@/components/MainLayout';
 import { TransferModal } from '@/components/TransferModal';
 import { ExchangeModal } from '@/components/ExchangeModal';
 import { CardManagementModal } from '@/components/CardManagementModal';
-import { mockAccounts, formatCurrency } from '@/mock/data';
+import { formatCurrency } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 import type { Account } from '@/mock/types';
 
 const Accounts = () => {
+  const accounts = useFinancialStore(state => state.accounts);
   const [showBalances, setShowBalances] = useState(true);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [transferOpen, setTransferOpen] = useState(false);
@@ -193,11 +195,11 @@ const Accounts = () => {
     },
   ];
 
-  const totalRub = mockAccounts
+  const totalRub = accounts
     .filter(acc => acc.currency === 'RUB')
     .reduce((sum, acc) => sum + acc.balance, 0);
 
-  const totalUsd = mockAccounts
+  const totalUsd = accounts
     .filter(acc => acc.currency === 'USD')
     .reduce((sum, acc) => sum + acc.balance, 0);
 
@@ -267,7 +269,7 @@ const Accounts = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Всего счетов</p>
-                <p className="text-2xl font-bold text-foreground">{mockAccounts.length}</p>
+                <p className="text-2xl font-bold text-foreground">{accounts.length}</p>
               </div>
             </div>
           </Card>
@@ -293,7 +295,7 @@ const Accounts = () => {
         <Card className="border-0 shadow-card" bordered={false}>
           <Table
             columns={columns}
-            dataSource={mockAccounts}
+            dataSource={accounts}
             rowKey="id"
             pagination={false}
             className="bank-table"

@@ -30,15 +30,17 @@ import {
   getMonthlyIncome,
   getMonthlyExpense,
 } from '@/mock/data';
+import { useFinancialStore } from '@/mock/financialStore';
 
 type Period = 'day' | 'month' | 'year';
 
 const Analytics = () => {
+  const transactions = useFinancialStore(state => state.transactions);
   const [period, setPeriod] = useState<Period>('month');
 
-  const monthlyIncome = getMonthlyIncome();
-  const monthlyExpense = getMonthlyExpense();
-  const categoryBreakdown = getCategoryBreakdown();
+  const monthlyIncome = getMonthlyIncome(transactions);
+  const monthlyExpense = getMonthlyExpense(transactions);
+  const categoryBreakdown = getCategoryBreakdown(transactions);
 
   const getAnalyticsData = () => {
     switch (period) {
@@ -66,12 +68,12 @@ const Analytics = () => {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Аналитика</h1>
-            <p className="text-muted-foreground">Анализ ваших финансов</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Аналитика</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Анализ ваших финансов</p>
           </div>
           <Segmented
             options={[
@@ -81,39 +83,40 @@ const Analytics = () => {
             ]}
             value={period}
             onChange={value => setPeriod(value as Period)}
-            size="large"
+            size="middle"
+            className="w-full sm:w-auto"
           />
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="stats-card" bordered={false}>
-            <div className="flex items-center gap-2 mb-2">
-              <ArrowDownOutlined className="text-success" />
-              <span className="text-sm text-muted-foreground">Доходы</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+              <ArrowDownOutlined className="text-success text-sm sm:text-base" />
+              <span className="text-xs sm:text-sm text-muted-foreground">Доходы</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{formatCurrency(totalIncome)}</p>
-            <p className="text-xs text-muted-foreground mt-1">{periodLabels[period]}</p>
+            <p className="text-lg sm:text-2xl font-bold text-foreground">{formatCurrency(totalIncome)}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{periodLabels[period]}</p>
           </Card>
 
           <Card className="stats-card" bordered={false}>
-            <div className="flex items-center gap-2 mb-2">
-              <ArrowUpOutlined className="text-destructive" />
-              <span className="text-sm text-muted-foreground">Расходы</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+              <ArrowUpOutlined className="text-destructive text-sm sm:text-base" />
+              <span className="text-xs sm:text-sm text-muted-foreground">Расходы</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{formatCurrency(totalExpense)}</p>
-            <p className="text-xs text-muted-foreground mt-1">{periodLabels[period]}</p>
+            <p className="text-lg sm:text-2xl font-bold text-foreground">{formatCurrency(totalExpense)}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{periodLabels[period]}</p>
           </Card>
 
           <Card className="stats-card" bordered={false}>
-            <div className="flex items-center gap-2 mb-2">
-              <LineChartOutlined className="text-primary" />
-              <span className="text-sm text-muted-foreground">Накоплено</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+              <LineChartOutlined className="text-primary text-sm sm:text-base" />
+              <span className="text-xs sm:text-sm text-muted-foreground">Накоплено</span>
             </div>
-            <p className={`text-2xl font-bold ${savings >= 0 ? 'amount-positive' : 'amount-negative'}`}>
+            <p className={`text-lg sm:text-2xl font-bold ${savings >= 0 ? 'amount-positive' : 'amount-negative'}`}>
               {formatCurrency(savings)}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">{periodLabels[period]}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{periodLabels[period]}</p>
           </Card>
 
           <Card className="stats-card" bordered={false}>
