@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Form, Input, Select, Button, Steps, message, InputNumber, Result, Tabs, Card } from 'antd';
+import { Form, Input, Select, Button, Steps, message, InputNumber, Result, Tabs, Card } from 'antd';
+import { Modal } from '@/components/ui/modal';
 import {
   MobileOutlined,
   HomeOutlined,

@@ -1,4 +1,5 @@
-import { Modal, Tag, Divider, Button } from 'antd';
+import { Tag, Divider, Button } from 'antd';
+import { Modal } from '@/components/ui/modal';
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,

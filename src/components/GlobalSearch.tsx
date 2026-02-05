@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Input, Modal, List, Tag, Empty } from 'antd';
+import { Input, List, Tag, Empty } from 'antd';
+import { Modal } from '@/components/ui/modal';
 import { SearchOutlined, CreditCardOutlined, SwapOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { mockAccounts, mockTransactions, formatCurrency, categoryInfo } from '@/mock/data';

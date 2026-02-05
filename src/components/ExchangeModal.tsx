@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Modal, Form, InputNumber, Select, Button, Card, Spin, message } from 'antd';
+import { Form, InputNumber, Select, Button, Card, Spin, message } from 'antd';
+import { Modal } from '@/components/ui/modal';
 import { SwapOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { formatCurrency } from '@/mock/data';
 import { useFinancialStore } from '@/mock/financialStore';

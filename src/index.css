@@ -13,6 +13,23 @@
         overscroll-behavior-y: contain;
     }
 
+    /* Предотвращение скролла фона при открытых модальных окнах */
+    body.body-scroll-lock,
+    html:has(body.body-scroll-lock) {
+        overflow: hidden !important;
+        position: fixed !important;
+        width: 100% !important;
+    }
+
+    /* Дополнительная защита для iOS Safari */
+    @supports (-webkit-touch-callout: none) {
+        body.body-scroll-lock {
+            position: fixed;
+            overflow: hidden;
+            width: 100%;
+        }
+    }
+
 
     :root {
         /* Core Banking Colors - Sovcombank Blue */
@@ -644,6 +661,22 @@
     }
 }
 
+/* Глобальные стили для модальных окон - предотвращение скролла фона */
+.ant-modal-wrap,
+.ant-modal-root .ant-modal-wrap {
+    overscroll-behavior: contain;
+}
+
+.ant-modal-body {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Предотвращаем скролл overlay */
+.ant-modal-mask {
+    touch-action: none;
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
 
@@ -780,5 +813,17 @@
         height: 4px;
         background: rgba(0, 0, 0, 0.15);
         border-radius: 2px;
+    }
+
+    /* Фиксируем скролл только внутри модального окна */
+    .ant-modal-wrap {
+        overflow: hidden !important;
+    }
+
+    .ant-modal-body {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
 }

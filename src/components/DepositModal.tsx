@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Form, InputNumber, Select, Button, Card, Steps, Result, Radio, Slider, message } from 'antd';
+import { Form, InputNumber, Select, Button, Card, Steps, Result, Radio, Slider, message } from 'antd';
+import { Modal } from '@/components/ui/modal';
 import {
   SafetyOutlined,
   PercentageOutlined,

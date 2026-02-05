@@ -32,7 +32,19 @@ const antTheme = {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ConfigProvider locale={ruRU} theme={antTheme}>
+    <ConfigProvider 
+      locale={ruRU} 
+      theme={antTheme}
+      modal={{
+        // Блокируем скролл body при открытии модального окна
+        styles: {
+          mask: {
+            // Предотвращаем события touch на маске
+            WebkitOverflowScrolling: 'auto',
+          },
+        },
+      }}
+    >
       <TooltipProvider>
         <Toaster />
         <Sonner />

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Button, message, Divider, Tag, Switch, Card, Form, Input, Steps, Result } from 'antd';
+import { Button, message, Divider, Tag, Switch, Card, Form, Input, Steps, Result } from 'antd';
+import { Modal } from '@/components/ui/modal';
 import {
   LockOutlined,
   UnlockOutlined,
