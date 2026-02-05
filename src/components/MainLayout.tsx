@@ -26,7 +26,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       {isMobile && (
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="fixed top-3 left-3 z-[60] p-2.5 rounded-xl bg-card shadow-lg border border-border lg:hidden transition-all duration-200 active:scale-95 hover:shadow-xl"
+          className="fixed top-3 right-3 z-[60] p-2.5 rounded-xl bg-card shadow-lg border border-border lg:hidden transition-all duration-200 active:scale-95 hover:shadow-xl"
           aria-label="Toggle menu"
         >
           {isMobileMenuOpen ? <CloseOutlined className="text-lg" /> : <MenuOutlined className="text-lg" />}
@@ -45,7 +45,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-40 animate-fadeIn"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed left-0 top-0 z-50 animate-slideIn">
+          <div className="fixed right-0 top-0 z-50 animate-slideInFromRight">
             <Sidebar onCollapsedChange={setSidebarCollapsed} />
           </div>
         </>

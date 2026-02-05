@@ -32,9 +32,20 @@ interface SidebarProps {
 export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const logout = useAuthStore(state => state.logout);
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Keyboard shortcut for search
   useEffect(() => {
@@ -78,7 +89,7 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
   return (
     <>
       <aside 
-        className={`fixed left-0 top-0 h-full bg-sidebar text-sidebar-foreground transition-all duration-300 z-50 
+        className={`fixed ${isMobile ? 'right-0' : 'left-0'} top-0 h-full bg-sidebar text-sidebar-foreground transition-all duration-300 z-50 
           ${collapsed ? 'w-20' : 'w-64'} flex flex-col shadow-2xl overflow-y-auto backdrop-blur-sm`}
         style={{
           background: 'linear-gradient(180deg, rgba(0, 81, 168, 0.97) 0%, rgba(0, 81, 168, 1) 100%)',
