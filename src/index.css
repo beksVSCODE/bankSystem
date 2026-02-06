@@ -778,8 +778,8 @@
 
     /* Enhanced cards with hover effect */
     .ant-card:active {
-        transform: scale(0.98);
-        transition: transform 0.15s ease;
+        /* transform: scale(0.98);
+        transition: transform 0.15s ease; */
     }
 }
 
