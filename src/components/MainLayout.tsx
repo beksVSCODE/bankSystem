@@ -1,6 +1,8 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
-import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import { AIChatBot } from './AIChatBot';
+import { MenuOutlined, CloseOutlined, RobotOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -10,6 +12,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [chatBotOpen, setChatBotOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -59,6 +62,22 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           </div>
         </div>
       </main>
+
+      {/* AI ChatBot Floating Button */}
+      {!chatBotOpen && (
+        <Button
+          type="primary"
+          shape="circle"
+          size="large"
+          icon={<RobotOutlined className="text-xl" />}
+          onClick={() => setChatBotOpen(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 shadow-2xl z-40 flex items-center justify-center hover:scale-110 transition-transform"
+          title="AI Ассистент"
+        />
+      )}
+
+      {/* AI ChatBot Component */}
+      <AIChatBot open={chatBotOpen} onClose={() => setChatBotOpen(false)} />
     </div>
   );
 };

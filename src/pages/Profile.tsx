@@ -12,10 +12,14 @@ import {
   EditOutlined,
   LogoutOutlined,
   CheckCircleOutlined,
+  RobotOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import { MainLayout } from '@/components/MainLayout';
 import { mockUser, formatDate } from '@/mock/data';
 import { useAuthStore } from '@/mock/authStore';
+import { aiService } from '@/services/aiService';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -27,6 +31,9 @@ const Profile = () => {
     sms: false,
   });
   const [language, setLanguage] = useState('ru');
+  const [openAIKey, setOpenAIKey] = useState(aiService.getApiKey());
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
 
   const handleLogout = () => {
     Modal.confirm({
@@ -44,6 +51,31 @@ const Profile = () => {
   const handleEditSave = () => {
     message.success('Данные успешно сохранены');
     setIsEditModalOpen(false);
+  };
+
+  const handleSaveApiKey = () => {
+    if (openAIKey.trim()) {
+      aiService.setApiKey(openAIKey.trim());
+      message.success('API ключ успешно сохранен');
+      setIsApiKeyModalOpen(false);
+    } else {
+      message.error('Введите корректный API ключ');
+    }
+  };
+
+  const handleRemoveApiKey = () => {
+    Modal.confirm({
+      title: 'Удалить API ключ?',
+      content: 'AI ассистент перестанет работать. Вы сможете добавить ключ позже.',
+      okText: 'Удалить',
+      cancelText: 'Отмена',
+      okButtonProps: { danger: true },
+      onOk: () => {
+        aiService.setApiKey('');
+        setOpenAIKey('');
+        message.success('API ключ удален');
+      },
+    });
   };
 
   return (
@@ -201,6 +233,75 @@ const Profile = () => {
           </div>
         </Card>
 
+        {/* AI Settings */}
+        <Card className="border-0 shadow-card" bordered={false}>
+          <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
+            <RobotOutlined className="text-primary" />
+            AI Ассистент (Google Gemini)
+          </h3>
+          <div className="space-y-4">
+            <div className="p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="font-medium">Google Gemini API Ключ</p>
+                  <p className="text-sm text-muted-foreground">
+                    Бесплатный API для работы AI финансового ассистента
+                  </p>
+                </div>
+                <Tag color={openAIKey ? 'green' : 'default'}>
+                  {openAIKey ? '🟢 Настроен' : '⚪ Не настроен'}
+                </Tag>
+              </div>
+              
+              {openAIKey && (
+                <div className="mb-3 p-3 bg-background rounded border border-border">
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs flex-1 overflow-hidden text-ellipsis">
+                      {showApiKey ? openAIKey : '••••••••••••••••••••••••••••••••'}
+                    </code>
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={showApiKey ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                      onClick={() => setShowApiKey(!showApiKey)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() => setIsApiKeyModalOpen(true)}
+                >
+                  {openAIKey ? 'Изменить ключ' : 'Добавить ключ'}
+                </Button>
+                {openAIKey && (
+                  <Button
+                    danger
+                    onClick={handleRemoveApiKey}
+                  >
+                    Удалить
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
+              <p className="text-sm text-blue-900 dark:text-blue-100">
+                <strong>ℹ️ Как получить бесплатный API ключ:</strong>
+              </p>
+              <ol className="text-sm text-blue-800 dark:text-blue-200 mt-2 ml-4 space-y-1">
+                <li>1. Перейдите на <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">makersuite.google.com/app/apikey</a></li>
+                <li>2. Войдите через Google аккаунт</li>
+                <li>3. Нажмите "Create API key"</li>
+                <li>4. Скопируйте ключ и вставьте здесь</li>
+              </ol>
+            </div>
+          </div>
+        </Card>
+
         {/* Logout */}
         <Card className="border-0 shadow-card border-destructive/20" bordered={false}>
           <div className="flex items-center justify-between">
@@ -246,6 +347,49 @@ const Profile = () => {
               <Input defaultValue={mockUser.phone} />
             </Form.Item>
           </Form>
+        </Modal>
+
+        {/* API Key Modal */}
+        <Modal
+          title="Настройка Google Gemini API Ключа"
+          open={isApiKeyModalOpen}
+          onCancel={() => setIsApiKeyModalOpen(false)}
+          onOk={handleSaveApiKey}
+          okText="Сохранить"
+          cancelText="Отмена"
+        >
+          <div className="space-y-4">
+            <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded border border-yellow-200 dark:border-yellow-900">
+              <p className="text-sm text-yellow-900 dark:text-yellow-100">
+                <strong>⚠️ Безопасность:</strong> API ключ сохраняется локально в вашем браузере и не отправляется на наши серверы.
+              </p>
+            </div>
+            
+            <Form layout="vertical">
+              <Form.Item 
+                label="Google Gemini API Ключ"
+                extra="Ключ имеет формат: AIza..."
+              >
+                <Input.Password
+                  placeholder="AIza..."
+                  value={openAIKey}
+                  onChange={(e) => setOpenAIKey(e.target.value)}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </Form>
+
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-900">
+              <p className="text-sm text-blue-900 dark:text-blue-100 mb-2">
+                <strong>Где получить бесплатный API ключ?</strong>
+              </p>
+              <ol className="text-sm text-blue-800 dark:text-blue-200 ml-4 space-y-1">
+                <li>1. Зайдите на <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline font-medium">makersuite.google.com/app/apikey</a></li>
+                <li>2. Нажмите "Create API key"</li>
+                <li>3. Скопируйте ключ и вставьте выше</li>
+              </ol>
+            </div>
+          </div>
         </Modal>
       </div>
     </MainLayout>
