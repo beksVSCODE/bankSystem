@@ -164,18 +164,61 @@ ${recentTransactions}
                     }],
                     generationConfig: {
                         temperature: 0.7,
-                        maxOutputTokens: 500,
-                    }
+                        maxOutputTokens: 1000,
+                        topP: 0.95,
+                        topK: 40,
+                    },
+                    safetySettings: [
+                        {
+                            category: 'HARM_CATEGORY_HARASSMENT',
+                            threshold: 'BLOCK_NONE'
+                        },
+                        {
+                            category: 'HARM_CATEGORY_HATE_SPEECH',
+                            threshold: 'BLOCK_NONE'
+                        },
+                        {
+                            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                            threshold: 'BLOCK_NONE'
+                        },
+                        {
+                            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                            threshold: 'BLOCK_NONE'
+                        }
+                    ]
                 })
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
+                console.error('Gemini API Error:', errorData);
                 throw new Error(errorData.error?.message || 'Ошибка Gemini API');
             }
 
             const data = await response.json();
-            const assistantMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Извините, не удалось получить ответ.';
+
+            // Проверяем наличие ответа
+            if (!data.candidates || data.candidates.length === 0) {
+                console.error('No candidates in response:', data);
+                throw new Error('AI не смог сгенерировать ответ. Попробуйте переформулировать вопрос.');
+            }
+
+            const candidate = data.candidates[0];
+
+            // Проверяем блокировку контента
+            if (candidate.finishReason === 'SAFETY') {
+                throw new Error('Ответ заблокирован фильтрами безопасности. Попробуйте другой вопрос.');
+            }
+
+            if (candidate.finishReason === 'RECITATION') {
+                throw new Error('Ответ заблокирован из-за повторения. Попробуйте переформулировать.');
+            }
+
+            const assistantMessage = candidate?.content?.parts?.[0]?.text;
+
+            if (!assistantMessage || assistantMessage.trim().length === 0) {
+                throw new Error('Получен пустой ответ от AI. Попробуйте еще раз.');
+            }
 
             return {
                 message: assistantMessage.trim()

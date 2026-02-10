@@ -61,27 +61,28 @@ export const AIChatBot = ({ open, onClose }: AIChatBotProps) => {
     setInput('');
     setLoading(true);
 
-    // Преобразуем историю для API
-    const conversationHistory = messages.map(msg => ({
-      role: msg.role,
-      content: msg.content
-    }));
+    try {
+      // Преобразуем историю для API
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
 
-    const response = await aiService.sendMessage(
-      textToSend,
-      accounts,
-      transactions,
-      conversationHistory
-    );
+      const response = await aiService.sendMessage(
+        textToSend,
+        accounts,
+        transactions,
+        conversationHistory
+      );
 
-    setLoading(false);
+      setLoading(false);
 
-    if (response.error) {
-      let errorContent = `❌ Ошибка: ${response.error}`;
-      
-      // Специальная обработка ошибки квоты
-      if (response.error.includes('quota') || response.error.includes('billing') || response.error.includes('RESOURCE_EXHAUSTED')) {
-        errorContent = `❌ Превышена квота Google Gemini API
+      if (response.error) {
+        let errorContent = `❌ Ошибка: ${response.error}`;
+        
+        // Специальная обработка ошибки квоты
+        if (response.error.includes('quota') || response.error.includes('billing') || response.error.includes('RESOURCE_EXHAUSTED')) {
+          errorContent = `❌ Превышена квота Google Gemini API
 
 📊 Что случилось:
 Превышен лимит запросов (60/мин или 1500/день).
@@ -92,23 +93,33 @@ export const AIChatBot = ({ open, onClose }: AIChatBotProps) => {
 3. Gemini API бесплатный - ничего платить не нужно!
 
 💡 Лимиты обновляются автоматически.`;
+        }
+        
+        const errorMessage: Message = {
+          id: `msg-${Date.now()}-error`,
+          role: 'assistant',
+          content: errorContent,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } else {
+        const assistantMessage: Message = {
+          id: `msg-${Date.now()}-assistant`,
+          role: 'assistant',
+          content: response.message,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, assistantMessage]);
       }
-      
+    } catch (error) {
+      setLoading(false);
       const errorMessage: Message = {
         id: `msg-${Date.now()}-error`,
         role: 'assistant',
-        content: errorContent,
+        content: `❌ Произошла ошибка при отправке сообщения. Попробуйте еще раз.\n\nЕсли проблема повторяется, проверьте:\n- Интернет соединение\n- API ключ в настройках профиля`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
-    } else {
-      const assistantMessage: Message = {
-        id: `msg-${Date.now()}-assistant`,
-        role: 'assistant',
-        content: response.message,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
     }
   };
 
