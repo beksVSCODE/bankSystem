@@ -72,6 +72,16 @@ export const mockAccounts: Account[] = [
     },
     {
         id: 'acc-5',
+        name: 'Евро счёт',
+        type: 'checking',
+        currency: 'EUR',
+        balance: 3250.00,
+        accountNumber: '40817978500000555666',
+        isActive: true,
+        color: '#14B8A6',
+    },
+    {
+        id: 'acc-6',
         name: 'Вклад "Выгодный"',
         type: 'deposit',
         currency: 'RUB',

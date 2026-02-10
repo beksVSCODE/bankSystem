@@ -37,6 +37,8 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
   const [fromAmount, setFromAmount] = useState<number>(0);
   const [toAmount, setToAmount] = useState<number>(0);
   const [success, setSuccess] = useState(false);
+  const [selectedFromAccount, setSelectedFromAccount] = useState<string | undefined>();
+  const [selectedToAccount, setSelectedToAccount] = useState<string | undefined>();
   const [form] = Form.useForm();
 
   const getRate = (from: string, to: string): number => {
@@ -46,6 +48,13 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
   };
 
   const currentRate = getRate(fromCurrency, toCurrency);
+
+  useEffect(() => {
+    // Reset selected accounts when currency changes
+    form.setFieldsValue({ fromAccount: undefined, toAccount: undefined });
+    setSelectedFromAccount(undefined);
+    setSelectedToAccount(undefined);
+  }, [fromCurrency, toCurrency, form]);
 
   useEffect(() => {
     if (fromAmount > 0) {
@@ -73,6 +82,23 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
       
       const values = form.getFieldsValue();
       if (!values.fromAccount || !values.toAccount || !fromAmount || !toAmount) {
+        message.error('Заполните все поля');
+        return;
+      }
+      
+      if (values.fromAccount === values.toAccount) {
+        message.error('Выберите разные счета');
+        return;
+      }
+      
+      if (fromCurrency === toCurrency) {
+        message.error('Выберите разные валюты');
+        return;
+      }
+      
+      const fromAccount = accounts.find(acc => acc.id === values.fromAccount);
+      if (fromAccount && fromAccount.balance < fromAmount) {
+        message.error('Недостаточно средств для обмена');
         return;
       }
       
@@ -86,12 +112,13 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
       );
       
       if (!exchangeSuccess) {
-        message.error('Недостаточно средств для обмена');
+        message.error('Ошибка при обмене валюты');
         setLoading(false);
         return;
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000));
+      message.success('Обмен валюты выполнен успешно');
       setLoading(false);
       setSuccess(true);
     } catch {
@@ -103,12 +130,17 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
     setFromAmount(0);
     setToAmount(0);
     setSuccess(false);
+    setSelectedFromAccount(undefined);
+    setSelectedToAccount(undefined);
     form.resetFields();
     onClose();
   };
 
   const fromAccounts = accounts.filter(acc => acc.currency === fromCurrency);
   const toAccounts = accounts.filter(acc => acc.currency === toCurrency);
+  
+  const selectedFromAccountData = accounts.find(acc => acc.id === selectedFromAccount);
+  const selectedToAccountData = accounts.find(acc => acc.id === selectedToAccount);
 
   const currencySymbols: Record<string, string> = {
     RUB: '₽',
@@ -167,7 +199,7 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
       </div>
 
       {/* Exchange Form */}
-      <div className="space-y-4">
+      <Form form={form} layout="vertical" className="space-y-4">
         {/* From */}
         <div className="p-4 bg-muted/50 rounded-xl">
           <div className="flex items-center justify-between mb-2">
@@ -194,9 +226,26 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
             formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
             parser={value => value?.replace(/\s/g, '') as unknown as number}
           />
-          {fromAccounts.length > 0 && (
+          
+          <Form.Item
+            name="fromAccount"
+            className="mt-3 mb-0"
+            rules={[{ required: true, message: 'Выберите счет списания' }]}
+          >
+            <Select
+              placeholder="Выберите счет списания"
+              onChange={setSelectedFromAccount}
+              options={fromAccounts.map(acc => ({
+                value: acc.id,
+                label: `${acc.name} (${formatCurrency(acc.balance, acc.currency)})`,
+              }))}
+              disabled={fromAccounts.length === 0}
+            />
+          </Form.Item>
+          
+          {selectedFromAccountData && (
             <p className="text-xs text-muted-foreground mt-2">
-              Доступно: {formatCurrency(fromAccounts[0].balance, fromCurrency)}
+              Доступно: {formatCurrency(selectedFromAccountData.balance, fromCurrency)}
             </p>
           )}
         </div>
@@ -237,8 +286,30 @@ export const ExchangeModal = ({ open, onClose }: ExchangeModalProps) => {
               `${toAmount.toLocaleString('ru-RU')} ${currencySymbols[toCurrency]}`
             )}
           </div>
+          
+          <Form.Item
+            name="toAccount"
+            className="mt-3 mb-0"
+            rules={[{ required: true, message: 'Выберите счет зачисления' }]}
+          >
+            <Select
+              placeholder="Выберите счет зачисления"
+              onChange={setSelectedToAccount}
+              options={toAccounts.map(acc => ({
+                value: acc.id,
+                label: `${acc.name} (${formatCurrency(acc.balance, acc.currency)})`,
+              }))}
+              disabled={toAccounts.length === 0}
+            />
+          </Form.Item>
+          
+          {selectedToAccountData && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Баланс: {formatCurrency(selectedToAccountData.balance, toCurrency)}
+            </p>
+          )}
         </div>
-      </div>
+      </Form>
 
       <Button
         type="primary"

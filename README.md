@@ -59,6 +59,36 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Zustand (State Management)
+- Ant Design (UI Components)
+
+## Features
+
+### Currency Exchange
+The application includes a fully functional currency exchange feature that allows users to:
+- Exchange between RUB, USD, and EUR currencies
+- Automatically calculate exchange amounts based on current rates
+- Select source and destination accounts
+- View real-time balance updates
+- Track all exchange transactions
+
+For detailed documentation, see [Exchange Feature Documentation](./docs/EXCHANGE_FEATURE.md)
+
+### Account Management
+- Multiple account types: Cards, Checking, Savings, Deposits
+- Multi-currency support (RUB, USD, EUR)
+- Balance tracking and updates
+
+### Transactions
+- Complete transaction history
+- Categorized transactions
+- Income and expense tracking
+- Transaction filtering and search
+
+### Analytics
+- Income vs. Expense charts
+- Category breakdown
+- Period-based analytics
 
 ## How can I deploy this project?
 
