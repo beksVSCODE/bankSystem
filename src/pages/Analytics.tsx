@@ -21,6 +21,7 @@ import {
   Legend,
 } from 'recharts';
 import { MainLayout } from '@/components/MainLayout';
+import { AIReportGenerator } from '@/components/AIReportGenerator';
 import {
   mockMonthlyAnalytics,
   mockDailyAnalytics,
@@ -277,6 +278,9 @@ const Analytics = () => {
             </div>
           </Card>
         </div>
+
+        {/* AI Report Section */}
+        <AIReportGenerator />
       </div>
     </MainLayout>
   );

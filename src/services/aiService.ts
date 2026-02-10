@@ -258,6 +258,158 @@ ${recentTransactions}
 
         return suggestions.slice(0, 4);
     }
+
+    // Генерация финансового отчета на естественном языке
+    async generateReport(
+        accounts: Account[],
+        transactions: Transaction[],
+        period: 'week' | 'month' | 'year' = 'month'
+    ): Promise<ChatResponse> {
+        if (!this.hasApiKey()) {
+            return {
+                message: '',
+                error: 'API ключ Gemini не настроен.'
+            };
+        }
+
+        try {
+            const now = new Date();
+            const startDate = new Date();
+            let periodName = '';
+
+            switch (period) {
+                case 'week':
+                    startDate.setDate(now.getDate() - 7);
+                    periodName = 'неделю';
+                    break;
+                case 'month':
+                    startDate.setMonth(now.getMonth() - 1);
+                    periodName = 'месяц';
+                    break;
+                case 'year':
+                    startDate.setFullYear(now.getFullYear() - 1);
+                    periodName = 'год';
+                    break;
+            }
+
+            // Фильтруем транзакции за период
+            const periodTransactions = transactions.filter(tx => {
+                const txDate = new Date(tx.date);
+                return txDate >= startDate && txDate <= now && tx.status === 'completed';
+            });
+
+            const income = periodTransactions
+                .filter(tx => tx.type === 'income')
+                .reduce((sum, tx) => sum + tx.amount, 0);
+
+            const expense = periodTransactions
+                .filter(tx => tx.type === 'expense')
+                .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+            // Группировка по категориям
+            const expensesByCategory = periodTransactions
+                .filter(tx => tx.type === 'expense')
+                .reduce((acc, tx) => {
+                    const category = tx.category;
+                    acc[category] = (acc[category] || 0) + Math.abs(tx.amount);
+                    return acc;
+                }, {} as Record<string, number>);
+
+            const topCategories = Object.entries(expensesByCategory)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5);
+
+            const totalBalance = accounts.reduce((sum, acc) => {
+                if (acc.currency === 'RUB') return sum + acc.balance;
+                return sum;
+            }, 0);
+
+            const prompt = `Ты - финансовый аналитик. Создай детальный финансовый отчет на русском языке.
+
+ДАННЫЕ ЗА ПОСЛЕДНИЙ ${periodName.toUpperCase()}:
+
+📊 **Общая статистика:**
+- Доходы: ${formatCurrency(income, 'RUB')}
+- Расходы: ${formatCurrency(expense, 'RUB')}
+- Баланс за период: ${formatCurrency(income - expense, 'RUB')}
+- Текущий общий баланс: ${formatCurrency(totalBalance, 'RUB')}
+- Количество транзакций: ${periodTransactions.length}
+
+💰 **Топ-5 категорий расходов:**
+${topCategories.map(([cat, amount], idx) => `${idx + 1}. ${cat}: ${formatCurrency(amount, 'RUB')}`).join('\n')}
+
+📈 **Счета:**
+${accounts.map(acc => `- ${acc.name} (${acc.currency}): ${formatCurrency(acc.balance, acc.currency)}`).join('\n')}
+
+ЗАДАНИЕ:
+Создай структурированный финансовый отчет используя markdown форматирование:
+
+1. **Краткое резюме** (2-3 предложения о финансовом состоянии)
+2. **Доходы и расходы** (анализ баланса, процентное соотношение)
+3. **Анализ расходов** (детальный разбор топ категорий с процентами)
+4. **Тренды** (что изменилось, есть ли необычные траты)
+5. **Рекомендации** (3-5 конкретных совета по улучшению финансов)
+
+Используй:
+- Эмодзи для визуализации (📊 📈 📉 💰 💡 ⚠️ ✅)
+- **Жирный текст** для важных цифр
+- Списки для структуры
+- Проценты и сравнения
+
+Будь конкретным, используй только предоставленные данные.`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.getApiKey()}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.5,
+                        maxOutputTokens: 2000,
+                        topP: 0.95,
+                        topK: 40,
+                    },
+                    safetySettings: [
+                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Ошибка генерации отчета');
+            }
+
+            const data = await response.json();
+            const report = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (!report) {
+                throw new Error('Не удалось сгенерировать отчет');
+            }
+
+            return {
+                message: report.trim()
+            };
+
+        } catch (error) {
+            console.error('Report Generation Error:', error);
+            return {
+                message: '',
+                error: error instanceof Error ? error.message : 'Ошибка при генерации отчета'
+            };
+        }
+    }
 }
 
 export const aiService = new AIService();
