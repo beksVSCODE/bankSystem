@@ -7,6 +7,7 @@ import { ConfigProvider } from "antd";
 import ruRU from "antd/locale/ru_RU";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SupabaseDataProvider } from "@/components/SupabaseDataProvider";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -97,6 +98,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </SupabaseDataProvider>
+          <PWAInstallPrompt />
         </BrowserRouter>
       </TooltipProvider>
     </ConfigProvider>

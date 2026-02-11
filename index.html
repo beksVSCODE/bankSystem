@@ -1,26 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Test App</title>
-    <meta name="description" content="Bank" />
-    <meta name="author" content="bank" />
+    
+    <title>FinSim Dashboard - Финансовая панель</title>
+    <meta name="description" content="Финансовая панель управления - управляйте своими счетами и транзакциями" />
+    <meta name="author" content="FinSim" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0050B3" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="FinSim" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Lovable App" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <meta property="og:title" content="FinSim Dashboard" />
+    <meta property="og:description" content="Финансовая панель управления" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://ru.kabar.kg/media/images/best-banks-2021-405_iTH6BXH.2e16d0ba.format-webp.fill-1668x1014.webp" />
+    <meta property="og:image" content="/icons/icon-512x512.png" />
 
-    <!-- <meta name="twitter:card" content="summary_large_image" /> -->
-    <!-- <meta name="twitter:site" content="@Lovable" /> -->
-    <meta name="twitter:image" content="https://ru.kabar.kg/media/images/best-banks-2021-405_iTH6BXH.2e16d0ba.format-webp.fill-1668x1014.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/icons/icon-512x512.png" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('✅ SW registered:', registration);
+            })
+            .catch(error => {
+              console.log('❌ SW registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
