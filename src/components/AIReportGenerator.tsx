@@ -3,7 +3,7 @@ import { Button, Card, Spin, Select, message } from 'antd';
 import { FileTextOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
 import { aiService } from '@/services/aiService';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 
 export const AIReportGenerator = () => {
   const accounts = useFinancialStore(state => state.accounts);

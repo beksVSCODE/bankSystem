@@ -3,7 +3,7 @@ import { Form, InputNumber, Select, Button, Card, Spin, message } from 'antd';
 import { Modal } from '@/components/ui/modal';
 import { SwapOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { formatCurrency } from '@/mock/data';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 
 interface ExchangeModalProps {
   open: boolean;

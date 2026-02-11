@@ -31,7 +31,7 @@ import {
   getMonthlyIncome,
   getMonthlyExpense,
 } from '@/mock/data';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 
 type Period = 'day' | 'month' | 'year';
 

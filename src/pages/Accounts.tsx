@@ -21,7 +21,7 @@ import { TransferModal } from '@/components/TransferModal';
 import { ExchangeModal } from '@/components/ExchangeModal';
 import { CardManagementModal } from '@/components/CardManagementModal';
 import { formatCurrency } from '@/mock/data';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 import type { Account } from '@/mock/types';
 
 const Accounts = () => {

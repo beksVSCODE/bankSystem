@@ -10,7 +10,7 @@ import {
 import { MainLayout } from '@/components/MainLayout';
 import { TransactionDetailModal } from '@/components/TransactionDetailModal';
 import { categoryInfo, formatCurrency, formatDate } from '@/mock/data';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 import type { Transaction, TransactionCategory } from '@/mock/types';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';

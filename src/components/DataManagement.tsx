@@ -1,7 +1,7 @@
 import { Card, Button, message, Statistic, Row, Col } from 'antd';
 import { Modal } from '@/components/ui/modal';
 import { DeleteOutlined, ReloadOutlined, DatabaseOutlined } from '@ant-design/icons';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 import { formatCurrency } from '@/mock/data';
 
 export const DataManagement = () => {

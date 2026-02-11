@@ -10,7 +10,7 @@ import {
   ClearOutlined
 } from '@ant-design/icons';
 import { aiService } from '@/services/aiService';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 
 interface Message {
   id: string;

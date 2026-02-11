@@ -12,7 +12,7 @@ import {
   HistoryOutlined,
 } from '@ant-design/icons';
 import { formatCurrency } from '@/mock/data';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 
 interface PaymentModalProps {
   open: boolean;

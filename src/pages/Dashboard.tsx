@@ -28,7 +28,7 @@ import {
   getMonthlyExpense,
   categoryInfo,
 } from '@/mock/data';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {

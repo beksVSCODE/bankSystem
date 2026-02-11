@@ -3,7 +3,7 @@ import { Form, Input, Select, Button, Steps, message, InputNumber, Result } from
 import { Modal } from '@/components/ui/modal';
 import { SwapOutlined, UserOutlined, BankOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { formatCurrency } from '@/mock/data';
-import { useFinancialStore } from '@/mock/financialStore';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 import type { Account } from '@/mock/types';
 
 interface TransferModalProps {
