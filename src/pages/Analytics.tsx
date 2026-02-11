@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, Segmented, Progress } from 'antd';
 import {
   ArrowUpOutlined,
@@ -23,17 +23,65 @@ import {
 import { MainLayout } from '@/components/MainLayout';
 import { AIReportGenerator } from '@/components/AIReportGenerator';
 import {
-  mockMonthlyAnalytics,
-  mockDailyAnalytics,
-  mockYearlyAnalytics,
   getCategoryBreakdown,
   formatCurrency,
   getMonthlyIncome,
   getMonthlyExpense,
 } from '@/mock/data';
 import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
+import type { Transaction } from '@/mock/types';
+import dayjs from 'dayjs';
 
 type Period = 'day' | 'month' | 'year';
+
+// Генерация аналитических данных из транзакций Supabase
+const generateAnalyticsData = (transactions: Transaction[], period: Period) => {
+  const now = dayjs();
+  const data: { name: string; income: number; expense: number }[] = [];
+
+  if (period === 'day') {
+    // Последние 7 дней
+    for (let i = 6; i >= 0; i--) {
+      const date = now.subtract(i, 'day');
+      const dayTransactions = transactions.filter(tx => 
+        dayjs(tx.date).isSame(date, 'day')
+      );
+      data.push({
+        name: date.format('DD.MM'),
+        income: dayTransactions.filter(tx => tx.type === 'income').reduce((sum, tx) => sum + tx.amount, 0),
+        expense: dayTransactions.filter(tx => tx.type === 'expense').reduce((sum, tx) => sum + tx.amount, 0),
+      });
+    }
+  } else if (period === 'month') {
+    // Последние 6 месяцев
+    for (let i = 5; i >= 0; i--) {
+      const date = now.subtract(i, 'month');
+      const monthTransactions = transactions.filter(tx => 
+        dayjs(tx.date).isSame(date, 'month') && dayjs(tx.date).isSame(date, 'year')
+      );
+      data.push({
+        name: date.format('MMM'),
+        income: monthTransactions.filter(tx => tx.type === 'income').reduce((sum, tx) => sum + tx.amount, 0),
+        expense: monthTransactions.filter(tx => tx.type === 'expense').reduce((sum, tx) => sum + tx.amount, 0),
+      });
+    }
+  } else {
+    // Последние 5 лет
+    for (let i = 4; i >= 0; i--) {
+      const date = now.subtract(i, 'year');
+      const yearTransactions = transactions.filter(tx => 
+        dayjs(tx.date).isSame(date, 'year')
+      );
+      data.push({
+        name: date.format('YYYY'),
+        income: yearTransactions.filter(tx => tx.type === 'income').reduce((sum, tx) => sum + tx.amount, 0),
+        expense: yearTransactions.filter(tx => tx.type === 'expense').reduce((sum, tx) => sum + tx.amount, 0),
+      });
+    }
+  }
+
+  return data;
+};
 
 const Analytics = () => {
   const transactions = useFinancialStore(state => state.transactions);
@@ -43,23 +91,16 @@ const Analytics = () => {
   const monthlyExpense = getMonthlyExpense(transactions);
   const categoryBreakdown = getCategoryBreakdown(transactions);
 
-  const getAnalyticsData = () => {
-    switch (period) {
-      case 'day':
-        return mockDailyAnalytics;
-      case 'year':
-        return mockYearlyAnalytics;
-      default:
-        return mockMonthlyAnalytics;
-    }
-  };
-
-  const analyticsData = getAnalyticsData();
+  // Генерация данных для графиков на основе Supabase транзакций
+  const analyticsData = useMemo(() => 
+    generateAnalyticsData(transactions, period),
+    [transactions, period]
+  );
 
   const totalIncome = analyticsData.reduce((sum, d) => sum + d.income, 0);
   const totalExpense = analyticsData.reduce((sum, d) => sum + d.expense, 0);
   const savings = totalIncome - totalExpense;
-  const savingsRate = Math.round((savings / totalIncome) * 100);
+  const savingsRate = totalIncome > 0 ? Math.round((savings / totalIncome) * 100) : 0;
 
   const periodLabels = {
     day: 'За неделю',
