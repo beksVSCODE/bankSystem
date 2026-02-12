@@ -31,11 +31,11 @@ export const MobileHeader = () => {
         <div 
           className="relative"
           style={{
-            background: 'linear-gradient(180deg, rgba(0, 81, 168, 0.97) 0%, rgba(0, 81, 168, 1) 100%)',
+            background: 'linear-gradient(180deg, rgba(0, 81, 168, 0.98) 0%, rgba(0, 81, 168, 1) 100%)',
           }}
         >
-          {/* Decorative gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none"></div>
+          {/* Solid background base for mobile */}
+          <div className="absolute inset-0 bg-blue-700/10 pointer-events-none"></div>
           
           {/* Top row: Logo and Bell */}
           <div className="relative flex items-center justify-between px-4 py-3">
