@@ -37,7 +37,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Main content */}
       <main className={`transition-all duration-300 ease-in-out ${
         isMobile 
-          ? 'ml-0 pt-[120px] pb-[80px]' // Mobile: padding for header and bottom nav
+          ? 'ml-0 pb-[80px]' // Mobile: padding for bottom nav only (header is sticky now)
           : sidebarCollapsed 
             ? 'ml-20' 
             : 'ml-64'
