@@ -107,44 +107,36 @@ const Dashboard = () => {
                 Общий баланс
                 <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
               </p>
-              <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 tracking-tight break-words">
+              <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 tracking-tight break-words">
                 {formatCurrency(totalBalance)}
               </h2>
 
               {/* Вкладки фильтрации - мобильная версия */}
-              <div className="mb-3 sm:mb-4 w-full">
+              <div className="mb-4 sm:mb-5 w-full">
                 <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
                   <Segmented
                     value={activeTab}
                     onChange={(value) => setActiveTab(value as any)}
                     options={[
-                      { label: '🏦 Все', value: 'all' },
-                      { label: '📈 АУ', value: 'investment' },
-                      { label: '💳 Карты', value: 'cards' },
-                      { label: '👤 Личные', value: 'personal' },
-                      { label: '🏢 Бизнес', value: 'business' },
+                      { label: 'Все', value: 'all' },
+                      { label: 'АУ', value: 'investment' },
+                      { label: 'Карты', value: 'cards' },
+                      { label: 'Личные', value: 'personal' },
+                      { label: 'Бизнес', value: 'business' },
                     ]}
                     style={{ 
                       backgroundColor: 'rgba(255, 255, 255, 0.15)',
                       borderRadius: '12px',
-                      padding: '4px',
+                      padding: '6px',
                       minWidth: 'max-content',
                       color: 'white',
-                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                      fontSize: window.innerWidth < 640 ? '14px' : '15px',
                       display: 'flex',
                       whiteSpace: 'nowrap',
                     }}
                     className="custom-segmented-white"
                   />
                 </div>
-                {/* Полные названия для справки на мобильных */}
-                <p className="text-xs text-white/60 mt-2 sm:hidden">
-                  {activeTab === 'all' ? 'Все счета' :
-                   activeTab === 'investment' ? 'Кабинет АУ по физлицам' :
-                   activeTab === 'cards' ? 'Карты' :
-                   activeTab === 'personal' ? 'Счета физ.лица' :
-                   'Расчётные счета'}
-                </p>
               </div>
 
               <div className="flex flex-col xs:flex-row gap-3 xs:gap-4 sm:gap-6">
@@ -209,18 +201,18 @@ const Dashboard = () => {
                         onClick={() => navigate('/accounts')}
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-white/20">
-                            <CreditCardOutlined style={{ color: 'white', fontSize: window.innerWidth < 640 ? 12 : 16 }} />
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-white/20">
+                            <CreditCardOutlined style={{ color: 'white', fontSize: window.innerWidth < 640 ? 14 : 16 }} />
                           </div>
-                          <span className="text-[8px] xs:text-[9px] text-white/70 uppercase font-semibold">
+                          <span className="text-[9px] xs:text-[10px] sm:text-xs text-white/70 uppercase font-semibold">
                             {card.paymentSystem}
                           </span>
                         </div>
-                        <p className="text-[10px] xs:text-xs text-white/70 mb-1 truncate">{card.cardNumber}</p>
-                        <p className="text-xs xs:text-sm font-bold text-white tracking-tight mb-1 truncate">
+                        <p className="text-xs xs:text-sm text-white/70 mb-1 truncate">{card.cardNumber}</p>
+                        <p className="text-sm xs:text-base font-bold text-white tracking-tight mb-1 truncate">
                           {account?.name || 'Счет'}
                         </p>
-                        <p className="text-[8px] xs:text-[9px] text-white/60">
+                        <p className="text-[9px] xs:text-[10px] text-white/60">
                           {card.status === 'active' ? '✓ Активна' : '✗ Заблокирована'}
                         </p>
                       </div>
@@ -236,21 +228,21 @@ const Dashboard = () => {
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div
-                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center"
                           style={{ backgroundColor: `${getAccountTypeColor(account.accountType)}25` }}
                         >
                           {account.accountType === 'deposit' || account.accountType === 'savings' ? (
-                            <SafetyOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 12 : 16 }} />
+                            <SafetyOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 14 : 16 }} />
                           ) : (
-                            <WalletOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 12 : 16 }} />
+                            <WalletOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 14 : 16 }} />
                           )}
                         </div>
-                        <span className="text-[8px] xs:text-[9px] text-white/70 uppercase font-semibold">
+                        <span className="text-[9px] xs:text-[10px] sm:text-xs text-white/70 uppercase font-semibold">
                           {account.currency}
                         </span>
                       </div>
-                      <p className="text-[10px] xs:text-xs text-white/70 mb-1 truncate">{account.name}</p>
-                      <p className="text-xs xs:text-sm font-bold text-white tracking-tight">
+                      <p className="text-xs xs:text-sm text-white/70 mb-1 truncate">{account.name}</p>
+                      <p className="text-sm xs:text-base font-bold text-white tracking-tight">
                         {formatCurrency(account.balance, account.currency)}
                       </p>
                     </div>

@@ -42,25 +42,28 @@ export const DataManagement = () => {
         </Button>
       }
     >
-      <Row gutter={16}>
-        <Col span={8}>
+      <Row gutter={[12, 16]} className="mb-4">
+        <Col xs={24} sm={12} lg={8}>
           <Statistic
             title="Всего счетов"
             value={accounts.length}
             prefix={<DatabaseOutlined />}
+            valueStyle={{ fontSize: 'clamp(20px, 5vw, 32px)' }}
           />
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={12} lg={8}>
           <Statistic
             title="Всего транзакций"
             value={transactions.length}
+            valueStyle={{ fontSize: 'clamp(20px, 5vw, 32px)' }}
           />
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={24} lg={8}>
           <Statistic
             title="Общий баланс"
             value={totalBalance}
             formatter={(value) => formatCurrency(Number(value))}
+            valueStyle={{ fontSize: 'clamp(16px, 4vw, 28px)' }}
           />
         </Col>
       </Row>

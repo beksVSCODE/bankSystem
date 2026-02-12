@@ -837,12 +837,12 @@
     /* Mobile responsive Segmented */
     @media (max-width: 640px) {
         .custom-segmented-white {
-            font-size: 11px !important;
+            font-size: 14px !important;
         }
 
         .custom-segmented-white .ant-segmented-item {
-            font-size: 11px !important;
-            padding: 6px 8px !important;
+            font-size: 14px !important;
+            padding: 8px 12px !important;
         }
 
         .custom-segmented-white .ant-segmented-item-label {
@@ -852,16 +852,16 @@
 
     @media (max-width: 480px) {
         .custom-segmented-white {
-            font-size: 10px !important;
+            font-size: 13px !important;
         }
 
         .custom-segmented-white .ant-segmented-item {
-            font-size: 10px !important;
-            padding: 4px 6px !important;
+            font-size: 13px !important;
+            padding: 7px 10px !important;
         }
 
         .custom-segmented-white .ant-segmented-item-label {
-            padding: 0 2px !important;
+            padding: 0 3px !important;
         }
     }
 

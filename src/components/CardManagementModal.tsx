@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, message, Tag, Switch, Divider } from 'antd';
+import { Button, message, Tag, Divider } from 'antd';
 import { Modal } from '@/components/ui/modal';
 import {
   LockOutlined,
@@ -171,7 +171,7 @@ export const CardManagementModal = ({ open, onClose, account }: CardManagementMo
               <Divider className="my-3" />
 
               {/* Card Actions */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {/* Block/Unblock */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -182,14 +182,15 @@ export const CardManagementModal = ({ open, onClose, account }: CardManagementMo
                     )}
                     <span className="text-sm">Статус</span>
                   </div>
-                  <Switch
-                    checked={card.status === 'active'}
-                    onChange={() => handleBlockCard(card.id, card.status === 'blocked')}
+                  <Button
+                    onClick={() => handleBlockCard(card.id, card.status === 'blocked')}
                     loading={loading}
-                    size="small"
-                    checkedChildren="Активна"
-                    unCheckedChildren="Заблокирована"
-                  />
+                    type={card.status === 'active' ? 'primary' : 'default'}
+                    danger={card.status === 'blocked'}
+                    size="middle"
+                  >
+                    {card.status === 'active' ? 'Разблокировать' : 'Заблокировать'}
+                  </Button>
                 </div>
 
                 {/* Show PIN */}
