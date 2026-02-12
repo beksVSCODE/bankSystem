@@ -2,12 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ConfigProvider } from "antd";
 import ruRU from "antd/locale/ru_RU";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SupabaseDataProvider } from "@/components/SupabaseDataProvider";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { useEffect } from "react";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -32,6 +33,17 @@ const antTheme = {
   },
 };
 
+// ScrollToTop component - прокручивает страницу вверх при смене маршрута
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ConfigProvider 
@@ -51,6 +63,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <SupabaseDataProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
