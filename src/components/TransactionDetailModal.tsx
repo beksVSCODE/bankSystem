@@ -8,8 +8,9 @@ import {
   CloseCircleOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
-import { formatCurrency, formatDate, categoryInfo, mockAccounts } from '@/mock/data';
+import { formatCurrency, formatDate, categoryInfo } from '@/mock/data';
 import type { Transaction } from '@/mock/types';
+import { useSupabaseFinancialStore } from '@/mock/supabaseFinancialStore';
 import { message } from 'antd';
 
 interface TransactionDetailModalProps {
@@ -19,10 +20,12 @@ interface TransactionDetailModalProps {
 }
 
 export const TransactionDetailModal = ({ open, onClose, transaction }: TransactionDetailModalProps) => {
+  const accounts = useSupabaseFinancialStore(state => state.accounts);
+  
   if (!transaction) return null;
 
   const catInfo = categoryInfo[transaction.category];
-  const account = mockAccounts.find(acc => acc.id === transaction.accountId);
+  const account = accounts.find(acc => acc.id === transaction.accountId);
 
   const getStatusIcon = () => {
     switch (transaction.status) {

@@ -3,7 +3,8 @@ import { Input, List, Tag, Empty } from 'antd';
 import { Modal } from '@/components/ui/modal';
 import { SearchOutlined, CreditCardOutlined, SwapOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { mockAccounts, mockCards, mockTransactions, formatCurrency, categoryInfo, getPrimaryCard } from '@/mock/data';
+import { formatCurrency, categoryInfo, getPrimaryCard } from '@/mock/data';
+import { useSupabaseFinancialStore } from '@/mock/supabaseFinancialStore';
 
 interface GlobalSearchProps {
   open: boolean;
@@ -23,6 +24,11 @@ interface SearchResult {
 export const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
   const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
+  
+  // Получаем данные из Supabase
+  const accounts = useSupabaseFinancialStore(state => state.accounts);
+  const cards = useSupabaseFinancialStore(state => state.cards);
+  const transactions = useSupabaseFinancialStore(state => state.transactions);
 
   const quickActions: SearchResult[] = [
     { type: 'action', id: 'transfer', title: 'Перевод средств', subtitle: 'Перевести деньги', icon: <SwapOutlined />, path: '/accounts' },
@@ -39,8 +45,8 @@ export const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
     const foundResults: SearchResult[] = [];
 
     // Search accounts
-    mockAccounts.forEach(acc => {
-      const primaryCard = getPrimaryCard(acc.id, mockCards);
+    accounts.forEach(acc => {
+      const primaryCard = getPrimaryCard(acc.id, cards);
       if (
         acc.name.toLowerCase().includes(query) ||
         acc.accountNumber.includes(query) ||
@@ -58,7 +64,7 @@ export const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
     });
 
     // Search transactions
-    mockTransactions.forEach(tx => {
+    transactions.forEach(tx => {
       if (
         tx.description.toLowerCase().includes(query) ||
         (tx.merchant && tx.merchant.toLowerCase().includes(query)) ||
@@ -85,7 +91,7 @@ export const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
     });
 
     return foundResults.slice(0, 10);
-  }, [searchText]);
+  }, [searchText, accounts, cards, transactions, quickActions]);
 
   const handleSelect = (result: SearchResult) => {
     if (result.action) {

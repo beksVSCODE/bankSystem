@@ -202,7 +202,7 @@ export const PaymentModal = ({ open, onClose }: PaymentModalProps) => {
           form={form}
           layout="vertical"
           initialValues={{
-            fromAccount: mockAccounts[0]?.id,
+            fromAccount: accounts[0]?.id,
           }}
         >
           <div className="flex items-center gap-3 mb-4 p-3 bg-muted/50 rounded-lg">

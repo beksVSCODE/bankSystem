@@ -805,6 +805,66 @@
         border-radius: 8px !important;
     }
 
+    /* Custom white segmented for dashboard */
+    .custom-segmented-white .ant-segmented-item {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-weight: 500;
+        font-size: 13px;
+        padding: 8px 12px !important;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .custom-segmented-white .ant-segmented-item:hover {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    .custom-segmented-white .ant-segmented-item-selected {
+        background: rgba(255, 255, 255, 0.25) !important;
+        color: white !important;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .custom-segmented-white .ant-segmented-thumb {
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px);
+        border-radius: 8px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Mobile responsive Segmented */
+    @media (max-width: 640px) {
+        .custom-segmented-white {
+            font-size: 11px !important;
+        }
+
+        .custom-segmented-white .ant-segmented-item {
+            font-size: 11px !important;
+            padding: 6px 8px !important;
+        }
+
+        .custom-segmented-white .ant-segmented-item-label {
+            padding: 0 4px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .custom-segmented-white {
+            font-size: 10px !important;
+        }
+
+        .custom-segmented-white .ant-segmented-item {
+            font-size: 10px !important;
+            padding: 4px 6px !important;
+        }
+
+        .custom-segmented-white .ant-segmented-item-label {
+            padding: 0 2px !important;
+        }
+    }
+
     /* Larger modal bottom sheets */
     .ant-modal {
         margin: 0 !important;

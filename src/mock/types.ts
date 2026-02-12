@@ -24,6 +24,7 @@ export interface Account {
 
     // Классификация
     accountType: 'current' | 'savings' | 'deposit' | 'credit';
+    accountCategory: 'personal' | 'business' | 'investment';
     accountNumber: string;
 
     // Описание

@@ -68,10 +68,12 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
                 userId: acc.user_id,
                 name: acc.name,
                 accountType: acc.account_type,
+                accountCategory: acc.account_category || 'personal',
                 accountNumber: acc.account_number,
                 currency: acc.currency,
                 balance: parseFloat(acc.balance),
                 isActive: acc.is_active,
+                color: acc.color || '#0050B3',
                 createdAt: acc.created_at,
                 updatedAt: acc.updated_at,
                 // Опциональные поля для вкладов и кредитов
@@ -85,8 +87,11 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
             set({ accounts, isLoading: false });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            set({ error: errorMessage, isLoading: false });
-            console.error('Error loading accounts:', error);
+            console.error('Error loading accounts from Supabase:', error);
+            // Fallback to mock data
+            console.log('📦 Using mock accounts as fallback...');
+            const { mockAccounts } = await import('./data');
+            set({ accounts: mockAccounts, error: null, isLoading: false });
         }
     },
 
@@ -140,8 +145,11 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
             set({ cards, isLoading: false });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            set({ error: errorMessage, isLoading: false });
-            console.error('Error loading cards:', error);
+            console.error('Error loading cards from Supabase:', error);
+            // Fallback to mock data
+            console.log('📦 Using mock cards as fallback...');
+            const { mockCards } = await import('./data');
+            set({ cards: mockCards, error: null, isLoading: false });
         }
     },
 
@@ -181,8 +189,11 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
             set({ transactions, isLoading: false });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            set({ error: errorMessage, isLoading: false });
-            console.error('Error loading transactions:', error);
+            console.error('Error loading transactions from Supabase:', error);
+            // Fallback to mock data
+            console.log('📦 Using mock transactions as fallback...');
+            const { mockTransactions } = await import('./data');
+            set({ transactions: mockTransactions, error: null, isLoading: false });
         }
     },
 

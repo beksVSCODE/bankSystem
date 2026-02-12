@@ -189,7 +189,7 @@ export const DepositModal = ({ open, onClose }: DepositModalProps) => {
           form={form}
           layout="vertical"
           initialValues={{
-            fromAccount: mockAccounts[0]?.id,
+            fromAccount: accounts[0]?.id,
           }}
         >
           {/* Selected product info */}

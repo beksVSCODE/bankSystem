@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Button } from 'antd';
+import { Card, Button, Segmented } from 'antd';
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
@@ -9,6 +9,9 @@ import {
   CreditCardOutlined,
   SwapOutlined,
   SafetyOutlined,
+  BankOutlined,
+  ShopOutlined,
+  RiseOutlined,
 } from '@ant-design/icons';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { MainLayout } from '@/components/MainLayout';
@@ -34,11 +37,16 @@ import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
   const navigate = useNavigate();
   const accounts = useFinancialStore(state => state.accounts);
+  const cards = useFinancialStore(state => state.cards);
   const transactions = useFinancialStore(state => state.transactions);
   
   const totalBalance = getTotalBalance(accounts);
   const monthlyIncome = getMonthlyIncome(transactions);
   const monthlyExpense = getMonthlyExpense(transactions);
+
+  // State для активной вкладки
+  const [activeTab, setActiveTab] = useState<'all' | 'personal' | 'business' | 'investment' | 'cards'>('all');
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
   const getAccountTypeColor = (type: Account['accountType']) => {
     switch(type) {
@@ -48,6 +56,14 @@ const Dashboard = () => {
       default: return '#0050B3';
     }
   };
+
+  // Фильтрация счетов по активной вкладке
+  const filteredItems = activeTab === 'cards' 
+    ? cards 
+    : accounts.filter(account => {
+        if (activeTab === 'all') return true;
+        return account.accountCategory === activeTab;
+      });
 
   // Modal states
   const [transferOpen, setTransferOpen] = useState(false);
@@ -85,98 +101,163 @@ const Dashboard = () => {
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
           
-          <div className="relative z-10 flex flex-col gap-6">
+          <div className="relative z-10 flex flex-col gap-4 sm:gap-6">
             <div>
-              <p className="text-white/70 text-xs sm:text-sm mb-1 flex items-center gap-2">
+              <p className="text-white/70 text-xs sm:text-sm mb-2 sm:mb-3 flex items-center gap-2">
                 Общий баланс
                 <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
               </p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 tracking-tight">
+              <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 tracking-tight break-words">
                 {formatCurrency(totalBalance)}
               </h2>
-              <div className="flex flex-col xs:flex-row gap-4 xs:gap-6">
+
+              {/* Вкладки фильтрации - мобильная версия */}
+              <div className="mb-3 sm:mb-4 w-full">
+                <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                  <Segmented
+                    value={activeTab}
+                    onChange={(value) => setActiveTab(value as any)}
+                    options={[
+                      { label: '🏦 Все', value: 'all' },
+                      { label: '📈 АУ', value: 'investment' },
+                      { label: '💳 Карты', value: 'cards' },
+                      { label: '👤 Личные', value: 'personal' },
+                      { label: '🏢 Бизнес', value: 'business' },
+                    ]}
+                    style={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      borderRadius: '12px',
+                      padding: '4px',
+                      minWidth: 'max-content',
+                      color: 'white',
+                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                      display: 'flex',
+                      whiteSpace: 'nowrap',
+                    }}
+                    className="custom-segmented-white"
+                  />
+                </div>
+                {/* Полные названия для справки на мобильных */}
+                <p className="text-xs text-white/60 mt-2 sm:hidden">
+                  {activeTab === 'all' ? 'Все счета' :
+                   activeTab === 'investment' ? 'Кабинет АУ по физлицам' :
+                   activeTab === 'cards' ? 'Карты' :
+                   activeTab === 'personal' ? 'Счета физ.лица' :
+                   'Расчётные счета'}
+                </p>
+              </div>
+
+              <div className="flex flex-col xs:flex-row gap-3 xs:gap-4 sm:gap-6">
                 <div className="flex items-center gap-2 sm:gap-3 group/income">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 transition-all group-hover/income:bg-white/30 group-hover/income:scale-110">
-                    <ArrowDownOutlined className="text-success-foreground text-sm sm:text-base" />
+                    <ArrowDownOutlined className="text-success-foreground text-xs sm:text-base" />
                   </div>
-                  <div>
-                    <p className="text-white/70 text-xs">Доходы</p>
-                    <p className="font-semibold text-sm sm:text-base">{formatCurrency(monthlyIncome)}</p>
+                  <div className="min-w-0">
+                    <p className="text-white/70 text-[10px] xs:text-xs">Доходы</p>
+                    <p className="font-semibold text-xs xs:text-sm sm:text-base truncate">{formatCurrency(monthlyIncome)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3 group/expense">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 transition-all group-hover/expense:bg-white/30 group-hover/expense:scale-110">
-                    <ArrowUpOutlined className="text-destructive-foreground text-sm sm:text-base" />
+                    <ArrowUpOutlined className="text-destructive-foreground text-xs sm:text-base" />
                   </div>
-                  <div>
-                    <p className="text-white/70 text-xs">Расходы</p>
-                    <p className="font-semibold text-sm sm:text-base">{formatCurrency(monthlyExpense)}</p>
+                  <div className="min-w-0">
+                    <p className="text-white/70 text-[10px] xs:text-xs">Расходы</p>
+                    <p className="font-semibold text-xs xs:text-sm sm:text-base truncate">{formatCurrency(monthlyExpense)}</p>
                   </div>
                 </div>
               </div>
             </div>
             
             {/* Quick Actions */}
-            <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-3">
+            <div className="grid grid-cols-4 gap-1.5 xs:gap-2 sm:flex sm:gap-3">
               {quickActions.map((action, index) => (
                 <button
                   key={index}
                   onClick={action.action}
-                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all duration-200 border border-white/10 hover:border-white/20"
+                  className="flex flex-col items-center gap-1 xs:gap-1.5 sm:gap-2 p-1.5 xs:p-2 sm:p-3 rounded-lg xs:rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all duration-200 border border-white/10 hover:border-white/20"
                 >
-                  <action.icon className="text-base sm:text-xl transition-transform group-hover:scale-110" />
-                  <span className="text-[10px] sm:text-xs leading-tight text-center font-medium">{action.label}</span>
+                  <action.icon className="text-sm xs:text-base sm:text-xl transition-transform group-hover:scale-110" />
+                  <span className="text-[8px] xs:text-[10px] sm:text-xs leading-tight text-center font-medium">{action.label}</span>
                 </button>
               ))}
             </div>
-          </div>
-        </div>
 
-        {/* Accounts Grid */}
-        <div>
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h3 className="text-base sm:text-lg font-semibold text-foreground">Мои счета</h3>
-            <Button type="link" onClick={() => navigate('/accounts')} className="p-0 text-xs sm:text-sm">
-              Все счета →
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {accounts.slice(0, 3).map((account, index) => (
-              <Card
-                key={account.id}
-                className="stats-card cursor-pointer hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 active:scale-98 overflow-hidden group"
-                onClick={() => navigate('/accounts')}
-                bordered={false}
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                }}
-              >
-                {/* Shine effect on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                
-                <div className="relative z-10">
-                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+            {/* Accounts/Cards Grid - inside the card */}
+            <div className="border-t border-white/20 pt-4 sm:pt-6 mt-2">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-base font-semibold text-white">
+                  {activeTab === 'all' ? 'Мои счета' :
+                   activeTab === 'investment' ? 'Кабинет АУ' :
+                   activeTab === 'cards' ? 'Карты' :
+                   activeTab === 'personal' ? 'Личные счета' :
+                   'Бизнес счета'}
+                </h3>
+                <Button type="link" onClick={() => navigate('/accounts')} className="p-0 text-[10px] xs:text-xs sm:text-sm text-white hover:text-white/80">
+                  Все →
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                {activeTab === 'cards' ? (
+                  // Отображение карт
+                  filteredItems.slice(0, 3).map((card, index) => {
+                    const account = accounts.find(acc => acc.id === card.accountId);
+                    return (
+                      <div
+                        key={card.id}
+                        className="bg-white/10 backdrop-blur-sm hover:bg-white/20 cursor-pointer transition-all duration-300 rounded-lg p-3 border border-white/20 hover:border-white/40 active:scale-95"
+                        onClick={() => navigate('/accounts')}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-white/20">
+                            <CreditCardOutlined style={{ color: 'white', fontSize: window.innerWidth < 640 ? 12 : 16 }} />
+                          </div>
+                          <span className="text-[8px] xs:text-[9px] text-white/70 uppercase font-semibold">
+                            {card.paymentSystem}
+                          </span>
+                        </div>
+                        <p className="text-[10px] xs:text-xs text-white/70 mb-1 truncate">{card.cardNumber}</p>
+                        <p className="text-xs xs:text-sm font-bold text-white tracking-tight mb-1 truncate">
+                          {account?.name || 'Счет'}
+                        </p>
+                        <p className="text-[8px] xs:text-[9px] text-white/60">
+                          {card.status === 'active' ? '✓ Активна' : '✗ Заблокирована'}
+                        </p>
+                      </div>
+                    );
+                  })
+                ) : (
+                  // Отображение счетов
+                  filteredItems.slice(0, 3).map((account, index) => (
                     <div
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
-                      style={{ backgroundColor: `${getAccountTypeColor(account.accountType)}15` }}
+                      key={account.id}
+                      className="bg-white/10 backdrop-blur-sm hover:bg-white/20 cursor-pointer transition-all duration-300 rounded-lg p-3 border border-white/20 hover:border-white/40 active:scale-95"
+                      onClick={() => navigate('/accounts')}
                     >
-                      {account.accountType === 'deposit' ? (
-                        <SafetyOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 16 : 20 }} />
-                      ) : account.accountType === 'savings' ? (
-                        <SafetyOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 16 : 20 }} />
-                      ) : (
-                        <WalletOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 16 : 20 }} />
-                      )}
+                      <div className="flex items-start justify-between mb-2">
+                        <div
+                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: `${getAccountTypeColor(account.accountType)}25` }}
+                        >
+                          {account.accountType === 'deposit' || account.accountType === 'savings' ? (
+                            <SafetyOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 12 : 16 }} />
+                          ) : (
+                            <WalletOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 12 : 16 }} />
+                          )}
+                        </div>
+                        <span className="text-[8px] xs:text-[9px] text-white/70 uppercase font-semibold">
+                          {account.currency}
+                        </span>
+                      </div>
+                      <p className="text-[10px] xs:text-xs text-white/70 mb-1 truncate">{account.name}</p>
+                      <p className="text-xs xs:text-sm font-bold text-white tracking-tight">
+                        {formatCurrency(account.balance, account.currency)}
+                      </p>
                     </div>
-                    <span className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold tracking-wider">{account.currency}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">{account.name}</p>
-                  <p className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
-                    {formatCurrency(account.balance, account.currency)}
-                  </p>
-                </div>
-              </Card>
-            ))}
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
