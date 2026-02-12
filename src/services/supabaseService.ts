@@ -65,14 +65,15 @@ export const accountService = {
         return data.map(acc => ({
             id: acc.id,
             name: acc.name,
-            type: acc.type,
+            accountType: acc.account_type,
             currency: acc.currency,
             balance: parseFloat(acc.balance),
             accountNumber: acc.account_number,
-            cardNumber: acc.card_number,
-            expiryDate: acc.expiry_date,
             isActive: acc.is_active,
-            color: acc.color,
+            interestRate: acc.interest_rate,
+            termMonths: acc.term_months,
+            maturityDate: acc.maturity_date,
+            overdraftLimit: acc.overdraft_limit,
         }));
     },
 
@@ -82,14 +83,15 @@ export const accountService = {
             .insert({
                 user_id: userId,
                 name: account.name,
-                type: account.type,
+                account_type: account.accountType,
                 currency: account.currency,
                 balance: account.balance,
                 account_number: account.accountNumber,
-                card_number: account.cardNumber,
-                expiry_date: account.expiryDate,
                 is_active: account.isActive,
-                color: account.color,
+                interest_rate: account.interestRate,
+                term_months: account.termMonths,
+                maturity_date: account.maturityDate,
+                overdraft_limit: account.overdraftLimit,
             })
             .select()
             .single();
@@ -121,18 +123,19 @@ export const accountService = {
         if (error) throw error;
     },
 
-    mapAccount(data: any): Account {
+    mapAccount(data: Record<string, unknown>): Account {
         return {
-            id: data.id,
-            name: data.name,
-            type: data.type,
-            currency: data.currency,
-            balance: parseFloat(data.balance),
-            accountNumber: data.account_number,
-            cardNumber: data.card_number,
-            expiryDate: data.expiry_date,
-            isActive: data.is_active,
-            color: data.color,
+            id: data.id as string,
+            name: data.name as string,
+            accountType: data.account_type as Account['accountType'],
+            currency: data.currency as string,
+            balance: parseFloat(data.balance as string),
+            accountNumber: data.account_number as string,
+            isActive: data.is_active as boolean,
+            interestRate: data.interest_rate as number | undefined,
+            termMonths: data.term_months as number | undefined,
+            maturityDate: data.maturity_date as string | undefined,
+            overdraftLimit: data.overdraft_limit as number | undefined,
         };
     },
 };
@@ -230,17 +233,19 @@ export const transactionService = {
         if (error) throw error;
     },
 
-    mapTransaction(data: any): Transaction {
+    mapTransaction(data: Record<string, unknown>): Transaction {
         return {
-            id: data.id,
-            date: data.date,
-            description: data.description,
-            category: data.category,
-            amount: parseFloat(data.amount),
-            type: data.type,
-            accountId: data.account_id,
-            merchant: data.merchant,
-            status: data.status,
+            id: data.id as string,
+            date: data.date as string,
+            description: data.description as string,
+            category: data.category as Transaction['category'],
+            amount: parseFloat(data.amount as string),
+            type: data.type as 'income' | 'expense',
+            accountId: data.account_id as string,
+            cardId: data.card_id as string | undefined,
+            merchant: data.merchant as string | undefined,
+            status: data.status as 'pending' | 'completed' | 'failed',
+            isPinned: data.is_pinned as boolean | undefined,
         };
     },
 };

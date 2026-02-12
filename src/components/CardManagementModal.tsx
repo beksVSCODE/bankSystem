@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, message, Divider, Tag, Switch, Card, Form, Input, Steps, Result } from 'antd';
+import { Button, message, Tag, Switch, Divider } from 'antd';
 import { Modal } from '@/components/ui/modal';
 import {
   LockOutlined,
@@ -10,10 +10,10 @@ import {
   SettingOutlined,
   WarningOutlined,
   PlusOutlined,
-  CheckCircleOutlined,
 } from '@ant-design/icons';
-import { formatCurrency } from '@/mock/data';
-import type { Account } from '@/mock/types';
+import { formatCurrency, getCardsByAccount, getPrimaryCard } from '@/mock/data';
+import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
+import type { Account, Card } from '@/mock/types';
 
 interface CardManagementModalProps {
   open: boolean;
@@ -21,304 +21,266 @@ interface CardManagementModalProps {
   account: Account | null;
 }
 
-type CardAction = 'details' | 'block' | 'limits' | 'pin' | 'order';
+const getAccountTypeColor = (type: Account['accountType']) => {
+  switch(type) {
+    case 'deposit': return '#EC4899';
+    case 'savings': return '#10B981';
+    case 'credit': return '#F59E0B';
+    default: return '#0050B3';
+  }
+};
 
 export const CardManagementModal = ({ open, onClose, account }: CardManagementModalProps) => {
-  const [showPIN, setShowPIN] = useState(false);
-  const [action, setAction] = useState<CardAction | null>(null);
+  const cards = useFinancialStore(state => state.cards);
+  const blockCard = useFinancialStore(state => state.blockCard);
+  const unblockCard = useFinancialStore(state => state.unblockCard);
+  
+  const [showPIN, setShowPIN] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [cardBlocked, setCardBlocked] = useState(false);
-  const [orderStep, setOrderStep] = useState(0);
-  const [form] = Form.useForm();
 
   // Mock PIN - in real app this would be fetched securely
   const mockPIN = '1234';
 
   const handleClose = () => {
-    setAction(null);
-    setShowPIN(false);
-    setOrderStep(0);
-    form.resetFields();
+    setShowPIN(null);
     onClose();
   };
 
-  const handleBlockCard = async () => {
+  const handleBlockCard = async (cardId: string, isBlocked: boolean) => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setCardBlocked(!cardBlocked);
+    
+    if (isBlocked) {
+      unblockCard(cardId);
+      message.success('Карта разблокирована');
+    } else {
+      blockCard(cardId, 'Заблокировано пользователем');
+      message.success('Карта заблокирована');
+    }
+    
     setLoading(false);
-    message.success(cardBlocked ? 'Карта разблокирована' : 'Карта заблокирована');
-    setAction(null);
   };
 
-  const handleOrderCard = async () => {
-    try {
-      await form.validateFields();
-      setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setLoading(false);
-      setOrderStep(2);
-    } catch {
-      // Validation failed
+  const getPaymentSystemColor = (system: Card['paymentSystem']) => {
+    switch (system) {
+      case 'MIR': return '#4BA72C';
+      case 'Visa': return '#1A1F71';
+      case 'Mastercard': return '#EB001B';
+      case 'UnionPay': return '#E21836';
+      default: return '#666';
     }
   };
 
-  const actions = [
-    { key: 'details', label: 'Реквизиты карты', icon: <CreditCardOutlined /> },
-    { key: 'block', label: cardBlocked ? 'Разблокировать' : 'Заблокировать', icon: cardBlocked ? <UnlockOutlined /> : <LockOutlined /> },
-    { key: 'limits', label: 'Лимиты', icon: <SettingOutlined /> },
-    { key: 'pin', label: 'Показать PIN', icon: <EyeOutlined /> },
-    { key: 'order', label: 'Заказать карту', icon: <PlusOutlined /> },
-  ];
+  const getCardTypeLabel = (type: Card['cardType']) => {
+    switch (type) {
+      case 'debit': return 'Дебетовая';
+      case 'credit': return 'Кредитная';
+      case 'virtual': return 'Виртуальная';
+      case 'prepaid': return 'Предоплаченная';
+      default: return type;
+    }
+  };
 
-  if (!account && action !== 'order') {
-    return (
-      <Modal
-        title="Управление картами"
-        open={open}
-        onCancel={handleClose}
-        footer={null}
-        width={480}
-      >
-        <div className="grid grid-cols-2 gap-3">
-          {actions.map(a => (
-            <button
-              key={a.key}
-              onClick={() => setAction(a.key as CardAction)}
-              className="flex flex-col items-center gap-3 p-5 rounded-xl border border-border hover:border-primary/50 hover:bg-muted/50 transition-all"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xl">
-                {a.icon}
-              </div>
-              <span className="font-medium text-foreground text-sm text-center">{a.label}</span>
-            </button>
-          ))}
-        </div>
-      </Modal>
-    );
+  if (!account) {
+    return null;
   }
 
-  // Order new card flow
-  if (action === 'order') {
-    return (
-      <Modal
-        title="Заказать новую карту"
-        open={open}
-        onCancel={handleClose}
-        footer={null}
-        width={520}
-      >
-        <Steps
-          current={orderStep}
-          size="small"
-          className="mb-6"
-          items={[
-            { title: 'Тип карты' },
-            { title: 'Доставка' },
-            { title: 'Готово' },
-          ]}
-        />
-
-        {orderStep === 0 && (
-          <div className="space-y-3">
-            {[
-              { type: 'debit', name: 'Дебетовая карта', desc: 'Для повседневных расходов', color: 'blue' },
-              { type: 'credit', name: 'Кредитная карта', desc: 'Кредитный лимит до 500 000 ₽', color: 'purple' },
-              { type: 'premium', name: 'Премиум карта', desc: 'Повышенный кэшбэк и привилегии', color: 'gold' },
-            ].map(card => (
-              <Card
-                key={card.type}
-                size="small"
-                className="cursor-pointer hover:border-primary/50 transition-colors"
-                onClick={() => setOrderStep(1)}
-              >
-                <div className="flex items-center gap-4">
-                  <div 
-                    className="w-16 h-10 rounded-lg flex items-center justify-center text-white font-bold"
-                    style={{ 
-                      background: card.color === 'blue' ? 'linear-gradient(135deg, #0050B3, #003A82)' :
-                                 card.color === 'purple' ? 'linear-gradient(135deg, #7C3AED, #5B21B6)' :
-                                 'linear-gradient(135deg, #F59E0B, #D97706)'
-                    }}
-                  >
-                    <CreditCardOutlined />
-                  </div>
-                  <div>
-                    <p className="font-medium">{card.name}</p>
-                    <p className="text-sm text-muted-foreground">{card.desc}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-            <Button onClick={() => setAction(null)} block className="mt-4">
-              Назад
-            </Button>
-          </div>
-        )}
-
-        {orderStep === 1 && (
-          <Form form={form} layout="vertical">
-            <Form.Item
-              name="address"
-              label="Адрес доставки"
-              rules={[{ required: true, message: 'Введите адрес' }]}
-            >
-              <Input.TextArea placeholder="г. Москва, ул. Примерная, д. 1, кв. 1" rows={2} />
-            </Form.Item>
-            <Form.Item
-              name="phone"
-              label="Контактный телефон"
-              rules={[{ required: true, message: 'Введите телефон' }]}
-              initialValue="+7 (999) 123-45-67"
-            >
-              <Input placeholder="+7 (999) 123-45-67" />
-            </Form.Item>
-
-            <div className="p-4 bg-muted/50 rounded-lg mb-4">
-              <p className="text-sm text-muted-foreground">Срок доставки: 3-5 рабочих дней</p>
-              <p className="text-sm text-muted-foreground">Стоимость: бесплатно</p>
-            </div>
-
-            <div className="flex gap-3">
-              <Button onClick={() => setOrderStep(0)} className="flex-1">
-                Назад
-              </Button>
-              <Button type="primary" onClick={handleOrderCard} loading={loading} className="flex-1">
-                Заказать
-              </Button>
-            </div>
-          </Form>
-        )}
-
-        {orderStep === 2 && (
-          <Result
-            status="success"
-            icon={<CheckCircleOutlined className="text-success" />}
-            title="Заявка принята!"
-            subTitle="Карта будет доставлена в течение 3-5 рабочих дней"
-            extra={[
-              <Button type="primary" key="close" onClick={handleClose}>
-                Готово
-              </Button>,
-            ]}
-          />
-        )}
-      </Modal>
-    );
-  }
+  const accountCards = getCardsByAccount(account.id, cards);
+  const primaryCard = getPrimaryCard(account.id, cards);
 
   return (
     <Modal
-      title={`Управление картой: ${account?.name}`}
+      title={`Управление картами: ${account.name}`}
       open={open}
       onCancel={handleClose}
       footer={null}
-      width={480}
+      width={600}
     >
-      {/* Card Preview */}
+      {/* Account Info */}
       <div
         className="p-6 rounded-xl text-white mb-6"
-        style={{ background: `linear-gradient(135deg, ${account?.color} 0%, ${account?.color}CC 100%)` }}
+        style={{ background: `linear-gradient(135deg, ${getAccountTypeColor(account.accountType)} 0%, ${getAccountTypeColor(account.accountType)}CC 100%)` }}
       >
-        <p className="text-white/70 text-sm mb-1">{account?.name}</p>
-        <p className="text-2xl font-bold mb-4">
-          {formatCurrency(account?.balance || 0, account?.currency)}
+        <p className="text-white/70 text-sm mb-1">Баланс счёта</p>
+        <p className="text-3xl font-bold mb-2">
+          {formatCurrency(account.balance, account.currency)}
         </p>
-        <p className="text-lg tracking-wider">{account?.cardNumber}</p>
-        {account?.expiryDate && (
-          <p className="text-sm text-white/70 mt-2">Действует до: {account.expiryDate}</p>
-        )}
-        {cardBlocked && (
-          <Tag color="red" className="mt-2">Заблокирована</Tag>
-        )}
+        <p className="text-sm text-white/80">Счёт: {account.accountNumber}</p>
       </div>
 
-      {/* Actions */}
-      <div className="space-y-3">
-        {/* Block/Unblock */}
-        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-center gap-3">
-            {cardBlocked ? <LockOutlined className="text-destructive" /> : <UnlockOutlined className="text-success" />}
-            <span>Статус карты</span>
-          </div>
-          <Switch
-            checked={!cardBlocked}
-            onChange={() => handleBlockCard()}
-            loading={loading}
-            checkedChildren="Активна"
-            unCheckedChildren="Заблокирована"
-          />
-        </div>
-
-        {/* Show PIN */}
-        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-center gap-3">
-            {showPIN ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-            <span>PIN-код</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-lg">
-              {showPIN ? mockPIN : '••••'}
-            </span>
-            <Button
-              type="text"
-              size="small"
-              icon={showPIN ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-              onClick={() => setShowPIN(!showPIN)}
-            />
-          </div>
-        </div>
-
-        {/* Limits */}
-        <div className="p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-center gap-3 mb-3">
-            <SettingOutlined />
-            <span className="font-medium">Лимиты</span>
-          </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Снятие наличных в день</span>
-              <span className="font-medium">300 000 ₽</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Переводы в день</span>
-              <span className="font-medium">500 000 ₽</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Покупки в день</span>
-              <span className="font-medium">Без ограничений</span>
-            </div>
-          </div>
-          <Button type="link" className="p-0 mt-2">
-            Изменить лимиты
+      {/* Cards List */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-semibold text-foreground">Карты счёта ({accountCards.length})</h4>
+          <Button
+            type="primary"
+            size="small"
+            icon={<PlusOutlined />}
+            onClick={() => message.info('Функция выпуска новой карты скоро будет доступна')}
+          >
+            Выпустить карту
           </Button>
         </div>
 
-        {/* Card Details */}
-        <div className="p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-center gap-3 mb-3">
-            <CreditCardOutlined />
-            <span className="font-medium">Реквизиты</span>
+        {accountCards.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <CreditCardOutlined className="text-4xl mb-2" />
+            <p>У этого счёта пока нет карт</p>
+            <Button
+              type="link"
+              icon={<PlusOutlined />}
+              onClick={() => message.info('Функция выпуска новой карты скоро будет доступна')}
+            >
+              Выпустить первую карту
+            </Button>
           </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Номер счёта</span>
-              <span className="font-mono">{account?.accountNumber}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">БИК</span>
-              <span className="font-mono">044525225</span>
-            </div>
-          </div>
-        </div>
+        ) : (
+          accountCards.map((card) => (
+            <div
+              key={card.id}
+              className="border border-border rounded-lg p-4 space-y-3"
+              style={{ borderColor: card.isPrimary ? getAccountTypeColor(account.accountType) : undefined }}
+            >
+              {/* Card Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-12 h-8 rounded flex items-center justify-center text-white font-bold text-xs"
+                    style={{ backgroundColor: getPaymentSystemColor(card.paymentSystem) }}
+                  >
+                    {card.paymentSystem}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-semibold">{card.cardNumber}</span>
+                      {card.isPrimary && (
+                        <Tag color="blue" className="text-xs">Основная</Tag>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Tag className="text-xs">{getCardTypeLabel(card.cardType)}</Tag>
+                      <span className="text-xs text-muted-foreground">до {card.expiryDate}</span>
+                    </div>
+                  </div>
+                </div>
+                <Tag color={card.status === 'active' ? 'green' : 'red'}>
+                  {card.status === 'active' ? 'Активна' : 'Заблокирована'}
+                </Tag>
+              </div>
 
-        {/* Warning */}
-        <div className="flex items-start gap-3 p-4 bg-warning/10 rounded-lg text-warning">
-          <WarningOutlined />
-          <p className="text-sm">
-            Никогда не сообщайте PIN-код и CVV посторонним лицам
-          </p>
+              <Divider className="my-3" />
+
+              {/* Card Actions */}
+              <div className="space-y-2">
+                {/* Block/Unblock */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {card.status === 'blocked' ? (
+                      <LockOutlined className="text-destructive" />
+                    ) : (
+                      <UnlockOutlined className="text-success" />
+                    )}
+                    <span className="text-sm">Статус</span>
+                  </div>
+                  <Switch
+                    checked={card.status === 'active'}
+                    onChange={() => handleBlockCard(card.id, card.status === 'blocked')}
+                    loading={loading}
+                    size="small"
+                    checkedChildren="Активна"
+                    unCheckedChildren="Заблокирована"
+                  />
+                </div>
+
+                {/* Show PIN */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {showPIN === card.id ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                    <span className="text-sm">PIN-код</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono">
+                      {showPIN === card.id ? mockPIN : '••••'}
+                    </span>
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={showPIN === card.id ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                      onClick={() => setShowPIN(showPIN === card.id ? null : card.id)}
+                    />
+                  </div>
+                </div>
+
+                {/* Limits */}
+                {card.dailyLimit && (
+                  <div className="p-3 bg-muted/30 rounded-lg mt-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <SettingOutlined className="text-xs" />
+                      <span className="text-xs font-medium">Лимиты карты</span>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Дневной лимит</span>
+                        <span className="font-medium">
+                          {formatCurrency(card.dailyLimit, account.currency)}
+                        </span>
+                      </div>
+                      {card.monthlyLimit && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Месячный лимит</span>
+                          <span className="font-medium">
+                            {formatCurrency(card.monthlyLimit, account.currency)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Account Details */}
+      <Divider />
+      <div className="p-4 bg-muted/50 rounded-lg">
+        <div className="flex items-center gap-3 mb-3">
+          <CreditCardOutlined />
+          <span className="font-medium">Реквизиты счёта</span>
         </div>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Номер счёта</span>
+            <span className="font-mono">{account.accountNumber}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">БИК</span>
+            <span className="font-mono">044525225</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Тип счёта</span>
+            <span className="font-medium">
+              {account.accountType === 'current' ? 'Текущий' :
+               account.accountType === 'savings' ? 'Накопительный' :
+               account.accountType === 'deposit' ? 'Вклад' : 'Кредитный'}
+            </span>
+          </div>
+          {account.interestRate && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Процентная ставка</span>
+              <span className="font-medium">{account.interestRate}% годовых</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Warning */}
+      <div className="flex items-start gap-3 p-4 bg-warning/10 rounded-lg text-warning mt-4">
+        <WarningOutlined />
+        <p className="text-sm">
+          Никогда не сообщайте PIN-код и CVV посторонним лицам
+        </p>
       </div>
 
       <Button onClick={handleClose} block className="mt-4">

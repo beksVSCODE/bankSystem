@@ -6,7 +6,6 @@ import {
   WalletOutlined,
   BankOutlined,
   SafetyOutlined,
-  PlusOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
   CopyOutlined,
@@ -20,41 +19,44 @@ import { MainLayout } from '@/components/MainLayout';
 import { TransferModal } from '@/components/TransferModal';
 import { ExchangeModal } from '@/components/ExchangeModal';
 import { CardManagementModal } from '@/components/CardManagementModal';
-import { formatCurrency } from '@/mock/data';
+import { formatCurrency, getCardsByAccount, getPrimaryCard } from '@/mock/data';
 import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
-import type { Account } from '@/mock/types';
+import type { Account, Card } from '@/mock/types';
 
 const Accounts = () => {
   const accounts = useFinancialStore(state => state.accounts);
+  const cards = useFinancialStore(state => state.cards);
   const [showBalances, setShowBalances] = useState(true);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [transferOpen, setTransferOpen] = useState(false);
   const [exchangeOpen, setExchangeOpen] = useState(false);
   const [cardManageOpen, setCardManageOpen] = useState(false);
 
-  const getAccountIcon = (type: Account['type']) => {
+  const getAccountIcon = (type: Account['accountType']) => {
     switch (type) {
-      case 'card':
-        return <CreditCardOutlined className="text-2xl" />;
+      case 'current':
+        return <WalletOutlined className="text-2xl" />;
       case 'savings':
         return <SafetyOutlined className="text-2xl" />;
       case 'deposit':
         return <BankOutlined className="text-2xl" />;
+      case 'credit':
+        return <CreditCardOutlined className="text-2xl" />;
       default:
         return <WalletOutlined className="text-2xl" />;
     }
   };
 
-  const getAccountTypeLabel = (type: Account['type']) => {
+  const getAccountTypeLabel = (type: Account['accountType']) => {
     switch (type) {
-      case 'card':
-        return 'Карта';
+      case 'current':
+        return 'Текущий';
       case 'savings':
         return 'Накопительный';
       case 'deposit':
         return 'Вклад';
-      case 'checking':
-        return 'Текущий';
+      case 'credit':
+        return 'Кредитный';
       default:
         return type;
     }
@@ -91,12 +93,11 @@ const Accounts = () => {
     {
       key: 'manage',
       icon: <SettingOutlined />,
-      label: 'Управление картой',
+      label: 'Управление картами',
       onClick: () => {
         setSelectedAccount(record);
         setCardManageOpen(true);
       },
-      disabled: record.type !== 'card',
     },
     {
       key: 'block',
@@ -120,12 +121,15 @@ const Accounts = () => {
             className="w-12 h-12 rounded-xl flex items-center justify-center"
             style={{ backgroundColor: `${record.color}15` }}
           >
-            <span style={{ color: record.color }}>{getAccountIcon(record.type)}</span>
+            <span style={{ color: record.color }}>{getAccountIcon(record.accountType)}</span>
           </div>
           <div>
             <p className="font-medium text-foreground">{record.name}</p>
             <p className="text-sm text-muted-foreground">
-              {record.cardNumber || record.accountNumber.slice(-8)}
+              {(() => {
+                const primaryCard = getPrimaryCard(record.id, cards);
+                return primaryCard?.cardNumber || `Счёт ••${record.accountNumber.slice(-4)}`;
+              })()}
             </p>
           </div>
         </div>
@@ -135,7 +139,7 @@ const Accounts = () => {
       title: 'Тип',
       key: 'type',
       render: (_: unknown, record: Account) => (
-        <Tag color="blue">{getAccountTypeLabel(record.type)}</Tag>
+        <Tag color="blue">{getAccountTypeLabel(record.accountType)}</Tag>
       ),
     },
     {
@@ -218,16 +222,6 @@ const Accounts = () => {
               onClick={() => setShowBalances(!showBalances)}
             >
               {showBalances ? 'Скрыть' : 'Показать'}
-            </Button>
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setSelectedAccount(null);
-                setCardManageOpen(true);
-              }}
-            >
-              Новая карта
             </Button>
           </div>
         </div>

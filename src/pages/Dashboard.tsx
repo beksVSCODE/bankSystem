@@ -4,7 +4,6 @@ import {
   ArrowUpOutlined,
   ArrowDownOutlined,
   SendOutlined,
-  PlusOutlined,
   QrcodeOutlined,
   WalletOutlined,
   CreditCardOutlined,
@@ -29,6 +28,7 @@ import {
   categoryInfo,
 } from '@/mock/data';
 import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
+import { Account } from '@/mock/types';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -39,6 +39,15 @@ const Dashboard = () => {
   const totalBalance = getTotalBalance(accounts);
   const monthlyIncome = getMonthlyIncome(transactions);
   const monthlyExpense = getMonthlyExpense(transactions);
+
+  const getAccountTypeColor = (type: Account['accountType']) => {
+    switch(type) {
+      case 'deposit': return '#EC4899';
+      case 'savings': return '#10B981';
+      case 'credit': return '#F59E0B';
+      default: return '#0050B3';
+    }
+  };
 
   // Modal states
   const [transferOpen, setTransferOpen] = useState(false);
@@ -64,18 +73,6 @@ const Dashboard = () => {
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">Добро пожаловать!</h1>
             <p className="text-sm sm:text-base text-muted-foreground">Обзор ваших финансов</p>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />} 
-              onClick={() => setCardManageOpen(true)}
-              size="middle"
-              className="w-full sm:w-auto"
-            >
-              <span className="hidden sm:inline">Новая карта</span>
-              <span className="sm:hidden">Карта</span>
-            </Button>
           </div>
         </div>
 
@@ -161,12 +158,14 @@ const Dashboard = () => {
                   <div className="flex items-start justify-between mb-2 sm:mb-3">
                     <div
                       className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
-                      style={{ backgroundColor: `${account.color}15` }}
+                      style={{ backgroundColor: `${getAccountTypeColor(account.accountType)}15` }}
                     >
-                      {account.type === 'card' ? (
-                        <CreditCardOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
+                      {account.accountType === 'deposit' ? (
+                        <SafetyOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 16 : 20 }} />
+                      ) : account.accountType === 'savings' ? (
+                        <SafetyOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 16 : 20 }} />
                       ) : (
-                        <WalletOutlined style={{ color: account.color, fontSize: window.innerWidth < 640 ? 16 : 20 }} />
+                        <WalletOutlined style={{ color: getAccountTypeColor(account.accountType), fontSize: window.innerWidth < 640 ? 16 : 20 }} />
                       )}
                     </div>
                     <span className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold tracking-wider">{account.currency}</span>
@@ -248,7 +247,7 @@ const Dashboard = () => {
             </div>
             <div className="space-y-2 sm:space-y-3">
               {recentTransactions.map((tx, index) => {
-                const catInfo = categoryInfo[tx.category];
+                const catInfo = categoryInfo[tx.category] || categoryInfo.other;
                 return (
                   <div
                     key={tx.id}

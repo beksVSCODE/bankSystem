@@ -3,7 +3,7 @@ import { Input, List, Tag, Empty } from 'antd';
 import { Modal } from '@/components/ui/modal';
 import { SearchOutlined, CreditCardOutlined, SwapOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { mockAccounts, mockTransactions, formatCurrency, categoryInfo } from '@/mock/data';
+import { mockAccounts, mockCards, mockTransactions, formatCurrency, categoryInfo, getPrimaryCard } from '@/mock/data';
 
 interface GlobalSearchProps {
   open: boolean;
@@ -40,10 +40,11 @@ export const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
 
     // Search accounts
     mockAccounts.forEach(acc => {
+      const primaryCard = getPrimaryCard(acc.id, mockCards);
       if (
         acc.name.toLowerCase().includes(query) ||
         acc.accountNumber.includes(query) ||
-        (acc.cardNumber && acc.cardNumber.includes(query))
+        (primaryCard && primaryCard.cardNumber.includes(query))
       ) {
         foundResults.push({
           type: 'account',

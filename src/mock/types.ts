@@ -13,29 +13,97 @@ export interface User {
     lastLogin: string;
 }
 
+// ГЛАВНАЯ СУЩНОСТЬ - Счёт (финансовый контейнер)
 export interface Account {
     id: string;
-    name: string;
-    type: 'card' | 'checking' | 'savings' | 'deposit';
-    currency: 'RUB' | 'USD' | 'EUR';
+    userId: string;
+
+    // Финансовые данные (БАЛАНС ТОЛЬКО У СЧЁТА!)
     balance: number;
+    currency: 'RUB' | 'USD' | 'EUR';
+
+    // Классификация
+    accountType: 'current' | 'savings' | 'deposit' | 'credit';
     accountNumber: string;
-    cardNumber?: string;
-    expiryDate?: string;
+
+    // Описание
+    name: string;
     isActive: boolean;
+
+    // Условия (для накопительных/вкладов)
+    interestRate?: number;      // процентная ставка
+    overdraftLimit?: number;    // лимит овердрафта
+
+    // UI
     color: string;
+
+    // Временные метки
+    createdAt: string;
+    updatedAt: string;
+    closedAt?: string;
 }
 
+// Карта - инструмент доступа к счёту (НЕ имеет собственного баланса)
+export interface Card {
+    id: string;
+    accountId: string;          // ПРИВЯЗКА К СЧЁТУ!
+
+    // Данные карты
+    cardNumber: string;
+    cardType: 'debit' | 'credit' | 'virtual' | 'prepaid';
+    paymentSystem: 'MIR' | 'Visa' | 'Mastercard' | 'UnionPay';
+
+    // Статус
+    status: 'active' | 'blocked' | 'expired' | 'ordered' | 'closed';
+    isPrimary: boolean;         // основная карта счёта
+
+    // Безопасность
+    expiryDate: string;         // MM/YY
+    cvvHash?: string;
+    pinHash?: string;
+
+    // Лимиты на уровне карты
+    dailyLimit?: number;
+    monthlyLimit?: number;
+    onlinePaymentsEnabled: boolean;
+    contactlessEnabled: boolean;
+    foreignPaymentsEnabled: boolean;
+
+    // Временные метки
+    issuedAt: string;
+    activatedAt?: string;
+    blockedAt?: string;
+    blockedReason?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// Транзакция - привязана к счёту (опционально через карту)
 export interface Transaction {
     id: string;
-    date: string;
-    description: string;
-    category: TransactionCategory;
+    accountId: string;          // К СЧЁТУ, а не к карте!
+    cardId?: string;            // через какую карту (если применимо)
+
+    // Финансовые данные
     amount: number;
+    currency: 'RUB' | 'USD' | 'EUR';
     type: 'income' | 'expense';
-    accountId: string;
+    category: TransactionCategory;
+
+    // Описание
+    description: string;
     merchant?: string;
-    status: 'completed' | 'pending' | 'failed';
+    mccCode?: string;           // код категории торговца
+    location?: string;
+
+    // Статус
+    status: 'pending' | 'completed' | 'declined' | 'reversed';
+
+    // Временные метки
+    date: string;
+    createdAt: string;
+    updatedAt: string;
+    completedAt?: string;
 }
 
 export type TransactionCategory =

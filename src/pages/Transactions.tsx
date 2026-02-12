@@ -88,7 +88,7 @@ const Transactions = () => {
       title: 'Описание',
       key: 'description',
       render: (_: unknown, record: Transaction) => {
-        const catInfo = categoryInfo[record.category];
+        const catInfo = categoryInfo[record.category] || categoryInfo.other;
         return (
           <div className="flex items-center gap-3">
             <div
@@ -117,7 +117,7 @@ const Transactions = () => {
       key: 'category',
       width: 180,
       render: (category: TransactionCategory) => {
-        const catInfo = categoryInfo[category];
+        const catInfo = categoryInfo[category] || categoryInfo.other;
         return (
           <Tag style={{ backgroundColor: `${catInfo.color}15`, color: catInfo.color, border: 'none' }}>
             {catInfo.nameRu}
