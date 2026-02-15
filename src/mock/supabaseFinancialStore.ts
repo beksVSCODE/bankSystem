@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Account, Card, Transaction } from './types';
-import { supabase } from '@/lib/supabase';
+// Removed Supabase dependency - using mock data only
 
 interface SupabaseFinancialState {
     accounts: Account[];
@@ -51,149 +51,45 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
     isLoading: false,
     error: null,
 
-    // Load accounts from Supabase
+    // Load accounts from mock data
     loadAccounts: async () => {
         set({ isLoading: true, error: null });
         try {
-            const { data, error } = await supabase
-                .from('accounts')
-                .select('*')
-                .eq('user_id', TEST_USER_ID)
-                .order('created_at', { ascending: true });
-
-            if (error) throw error;
-
-            const accounts: Account[] = (data || []).map(acc => ({
-                id: acc.id,
-                userId: acc.user_id,
-                name: acc.name,
-                accountType: acc.account_type,
-                accountCategory: acc.account_category || 'personal',
-                accountNumber: acc.account_number,
-                currency: acc.currency,
-                balance: parseFloat(acc.balance),
-                isActive: acc.is_active,
-                color: acc.color || '#0050B3',
-                createdAt: acc.created_at,
-                updatedAt: acc.updated_at,
-                // Опциональные поля для вкладов и кредитов
-                ...(acc.interest_rate && { interestRate: parseFloat(acc.interest_rate) }),
-                ...(acc.term_months && { termMonths: acc.term_months }),
-                ...(acc.maturity_date && { maturityDate: acc.maturity_date }),
-                ...(acc.overdraft_limit && { overdraftLimit: parseFloat(acc.overdraft_limit) }),
-            }));
-
-            console.log('✅ Loaded accounts from Supabase:', accounts);
-            set({ accounts, isLoading: false });
+            await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+            const { mockAccounts } = await import('./data');
+            set({ accounts: mockAccounts, isLoading: false });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            console.error('Error loading accounts from Supabase:', error);
-            // Fallback to mock data
-            console.log('📦 Using mock accounts as fallback...');
-            const { mockAccounts } = await import('./data');
-            set({ accounts: mockAccounts, error: null, isLoading: false });
+            console.error('Error loading accounts:', error);
+            set({ error: errorMessage, isLoading: false });
         }
     },
 
-    // Load cards from Supabase (НОВОЕ!)
+    // Load cards from mock data
     loadCards: async () => {
         set({ isLoading: true, error: null });
         try {
-            // Загружаем все карты для всех счетов пользователя
-            const { data: accountsData } = await supabase
-                .from('accounts')
-                .select('id')
-                .eq('user_id', TEST_USER_ID);
-
-            if (!accountsData || accountsData.length === 0) {
-                set({ cards: [], isLoading: false });
-                return;
-            }
-
-            const accountIds = accountsData.map(acc => acc.id);
-
-            const { data, error } = await supabase
-                .from('cards')
-                .select('*')
-                .in('account_id', accountIds)
-                .order('is_primary', { ascending: false });
-
-            if (error) throw error;
-
-            const cards: Card[] = (data || []).map(card => ({
-                id: card.id,
-                accountId: card.account_id,
-                cardNumber: card.card_number,
-                cardType: card.card_type,
-                paymentSystem: card.payment_system,
-                expiryDate: card.expiry_date,
-                cvv: card.cvv,
-                pin: card.pin,
-                status: card.status,
-                isPrimary: card.is_primary,
-                dailyLimit: card.daily_limit ? parseFloat(card.daily_limit) : undefined,
-                monthlyLimit: card.monthly_limit ? parseFloat(card.monthly_limit) : undefined,
-                contactless: card.contactless,
-                onlinePayments: card.online_payments,
-                abroadPayments: card.abroad_payments,
-                blockReason: card.block_reason,
-                createdAt: card.created_at,
-                updatedAt: card.updated_at,
-            }));
-
-            console.log('✅ Loaded cards from Supabase:', cards);
-            set({ cards, isLoading: false });
+            await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+            const { mockCards } = await import('./data');
+            set({ cards: mockCards, isLoading: false });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            console.error('Error loading cards from Supabase:', error);
-            // Fallback to mock data
-            console.log('📦 Using mock cards as fallback...');
-            const { mockCards } = await import('./data');
-            set({ cards: mockCards, error: null, isLoading: false });
+            console.error('Error loading cards:', error);
+            set({ error: errorMessage, isLoading: false });
         }
     },
 
-    // Load transactions from Supabase
+    // Load transactions from mock data
     loadTransactions: async () => {
         set({ isLoading: true, error: null });
         try {
-            const { data, error } = await supabase
-                .from('transactions')
-                .select('*')
-                .order('date', { ascending: false });
-
-            if (error) throw error;
-
-            const transactions: Transaction[] = (data || []).map(tx => ({
-                id: tx.id,
-                accountId: tx.account_id,
-                cardId: tx.card_id,
-                date: tx.date,
-                description: tx.description,
-                category: tx.category,
-                amount: parseFloat(tx.amount),
-                currency: tx.currency,
-                type: tx.type,
-                status: tx.status,
-                merchant: tx.merchant,
-                mccCode: tx.mcc_code,
-                location: tx.location,
-                latitude: tx.latitude,
-                longitude: tx.longitude,
-                notes: tx.notes,
-                createdAt: tx.created_at,
-                updatedAt: tx.updated_at,
-            }));
-
-            console.log('✅ Loaded transactions from Supabase:', transactions);
-            set({ transactions, isLoading: false });
+            await new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+            const { mockTransactions } = await import('./data');
+            set({ transactions: mockTransactions, isLoading: false });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            console.error('Error loading transactions from Supabase:', error);
-            // Fallback to mock data
-            console.log('📦 Using mock transactions as fallback...');
-            const { mockTransactions } = await import('./data');
-            set({ transactions: mockTransactions, error: null, isLoading: false });
+            console.error('Error loading transactions:', error);
+            set({ error: errorMessage, isLoading: false });
         }
     },
 
@@ -211,45 +107,20 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
         return get().accounts.find(acc => acc.id === id);
     },
 
-    // Update account balance (local + Supabase)
-    updateAccountBalance: async (accountId: string, newBalance: number) => {
-        // Update locally
+    // Update account balance (local only)
+    updateAccountBalance: (accountId: string, newBalance: number) => {
         set(state => ({
             accounts: state.accounts.map(acc =>
-                acc.id === accountId ? { ...acc, balance: newBalance } : acc
+                acc.id === accountId ? { ...acc, balance: newBalance, updatedAt: new Date().toISOString() } : acc
             ),
         }));
-
-        // Update in Supabase
-        await supabase
-            .from('accounts')
-            .update({ balance: newBalance })
-            .eq('id', accountId);
     },
 
-    // Add new account
-    addAccount: async (account: Account) => {
-        const { data, error } = await supabase
-            .from('accounts')
-            .insert({
-                user_id: TEST_USER_ID,
-                name: account.name,
-                account_type: account.accountType,
-                account_number: account.accountNumber,
-                currency: account.currency,
-                balance: account.balance,
-                is_active: account.isActive,
-                interest_rate: account.interestRate,
-                term_months: account.termMonths,
-                maturity_date: account.maturityDate,
-                overdraft_limit: account.overdraftLimit,
-            })
-            .select()
-            .single();
-
-        if (!error && data) {
-            await get().loadAccounts();
-        }
+    // Add new account (local only)
+    addAccount: (account: Account) => {
+        set(state => ({
+            accounts: [...state.accounts, account],
+        }));
     },
 
     // Card operations (НОВОЕ!)
@@ -266,68 +137,29 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
         return accountCards.find(card => card.isPrimary) || accountCards[0];
     },
 
-    addCard: async (card: Card) => {
-        const { data, error } = await supabase
-            .from('cards')
-            .insert({
-                account_id: card.accountId,
-                card_number: card.cardNumber,
-                card_type: card.cardType,
-                payment_system: card.paymentSystem,
-                expiry_date: card.expiryDate,
-                cvv: card.cvv,
-                pin: card.pin,
-                status: card.status,
-                is_primary: card.isPrimary,
-                daily_limit: card.dailyLimit,
-                monthly_limit: card.monthlyLimit,
-                contactless: card.contactless,
-                online_payments: card.onlinePayments,
-                abroad_payments: card.abroadPayments,
-            })
-            .select()
-            .single();
-
-        if (!error && data) {
-            await get().loadCards();
-        }
+    addCard: (card: Card) => {
+        set(state => ({
+            cards: [...state.cards, card],
+        }));
     },
 
-    updateCard: async (cardId: string, updates: Partial<Card>) => {
-        // Update locally
+    updateCard: (cardId: string, updates: Partial<Card>) => {
         set(state => ({
             cards: state.cards.map(card =>
-                card.id === cardId ? { ...card, ...updates } : card
+                card.id === cardId ? { ...card, ...updates, updatedAt: new Date().toISOString() } : card
             ),
         }));
-
-        // Prepare Supabase update object
-        const supabaseUpdates: Record<string, unknown> = {};
-        if (updates.status !== undefined) supabaseUpdates.status = updates.status;
-        if (updates.dailyLimit !== undefined) supabaseUpdates.daily_limit = updates.dailyLimit;
-        if (updates.monthlyLimit !== undefined) supabaseUpdates.monthly_limit = updates.monthlyLimit;
-        if (updates.contactless !== undefined) supabaseUpdates.contactless = updates.contactless;
-        if (updates.onlinePayments !== undefined) supabaseUpdates.online_payments = updates.onlinePayments;
-        if (updates.abroadPayments !== undefined) supabaseUpdates.abroad_payments = updates.abroadPayments;
-        if (updates.blockReason !== undefined) supabaseUpdates.block_reason = updates.blockReason;
-        if (updates.isPrimary !== undefined) supabaseUpdates.is_primary = updates.isPrimary;
-
-        // Update in Supabase
-        await supabase
-            .from('cards')
-            .update(supabaseUpdates)
-            .eq('id', cardId);
     },
 
-    blockCard: async (cardId: string, reason?: string) => {
-        await get().updateCard(cardId, {
+    blockCard: (cardId: string, reason?: string) => {
+        get().updateCard(cardId, {
             status: 'blocked',
             blockReason: reason
         });
     },
 
-    unblockCard: async (cardId: string) => {
-        await get().updateCard(cardId, {
+    unblockCard: (cardId: string) => {
+        get().updateCard(cardId, {
             status: 'active',
             blockReason: undefined
         });
@@ -335,56 +167,18 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
 
     // Add new transaction
     addTransaction: async (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
-        const { data, error } = await supabase
-            .from('transactions')
-            .insert({
-                account_id: transaction.accountId,
-                card_id: transaction.cardId,
-                date: transaction.date,
-                description: transaction.description,
-                category: transaction.category,
-                amount: transaction.amount,
-                currency: transaction.currency,
-                type: transaction.type,
-                status: transaction.status,
-                merchant: transaction.merchant,
-                mcc_code: transaction.mccCode,
-                location: transaction.location,
-                latitude: transaction.latitude,
-                longitude: transaction.longitude,
-                notes: transaction.notes,
-            })
-            .select()
-            .single();
-
-        if (error) {
-            console.error('Error adding transaction:', error);
-            return null;
-        }
-
-        // Reload transactions
-        await get().loadTransactions();
-
-        return {
-            id: data.id,
-            accountId: data.account_id,
-            cardId: data.card_id,
-            date: data.date,
-            description: data.description,
-            category: data.category,
-            amount: parseFloat(data.amount),
-            currency: data.currency,
-            type: data.type,
-            status: data.status,
-            merchant: data.merchant,
-            mccCode: data.mcc_code,
-            location: data.location,
-            latitude: data.latitude,
-            longitude: data.longitude,
-            notes: data.notes,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at,
+        const newTransaction: Transaction = {
+            ...transaction,
+            id: `tx-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         };
+        
+        set(state => ({
+            transactions: [newTransaction, ...state.transactions],
+        }));
+
+        return newTransaction;
     },
 
     // Get transactions by account
@@ -415,8 +209,8 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
         }
 
         // Update balances
-        await updateAccountBalance(fromAccountId, fromAccount.balance - amount);
-        await updateAccountBalance(toAccountId, toAccount.balance + amount);
+        updateAccountBalance(fromAccountId, fromAccount.balance - amount);
+        updateAccountBalance(toAccountId, toAccount.balance + amount);
 
         // Add transactions
         await addTransaction({
@@ -511,8 +305,8 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
             return false;
         }
 
-        await updateAccountBalance(fromAccountId, fromAccount.balance - fromAmount);
-        await updateAccountBalance(toAccountId, toAccount.balance + toAmount);
+        updateAccountBalance(fromAccountId, fromAccount.balance - fromAmount);
+        updateAccountBalance(toAccountId, toAccount.balance + toAmount);
 
         await addTransaction({
             accountId: fromAccountId,
@@ -559,13 +353,15 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
 
         const newDeposit: Account = {
             id: `dep-${Date.now()}`,
-            userId: TEST_USER_ID,
+            userId: sourceAccount.userId,
             name: depositName,
             accountType: 'deposit',
+            accountCategory: 'personal',
             accountNumber: `42305${sourceAccount.currency === 'RUB' ? '810' : '840'}${Date.now().toString().slice(-12)}`,
             currency: sourceAccount.currency,
             balance: amount,
             isActive: true,
+            color: '#FFA500',
             interestRate: rate,
             termMonths: 12,
             maturityDate: maturityDate.toISOString().split('T')[0],
@@ -573,8 +369,8 @@ export const useSupabaseFinancialStore = create<SupabaseFinancialState>((set, ge
             updatedAt: new Date().toISOString(),
         };
 
-        await updateAccountBalance(sourceAccountId, sourceAccount.balance - amount);
-        await addAccount(newDeposit);
+        updateAccountBalance(sourceAccountId, sourceAccount.balance - amount);
+        addAccount(newDeposit);
 
         await addTransaction({
             accountId: sourceAccountId,

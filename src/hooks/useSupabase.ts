@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { accountService, transactionService, notificationService, userService } from '@/services/supabaseService';
+// TOGGLE: Change between '@/services/supabaseService' and '@/services/mockService'
+import { accountService, transactionService, notificationService, userService } from '@/services/mockService';
 import type { Account, Transaction, Notification } from '@/mock/types';
 
 // User Hooks
