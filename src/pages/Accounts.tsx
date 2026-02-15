@@ -22,6 +22,7 @@ import { CardManagementModal } from '@/components/CardManagementModal';
 import { formatCurrency, getCardsByAccount, getPrimaryCard } from '@/mock/data';
 import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 import type { Account, Card } from '@/mock/types';
+import { useNavigate } from 'react-router-dom';
 
 const Accounts = () => {
   const accounts = useFinancialStore(state => state.accounts);
@@ -31,6 +32,7 @@ const Accounts = () => {
   const [transferOpen, setTransferOpen] = useState(false);
   const [exchangeOpen, setExchangeOpen] = useState(false);
   const [cardManageOpen, setCardManageOpen] = useState(false);
+  const navigate = useNavigate();
 
   const getAccountIcon = (type: Account['accountType']) => {
     switch (type) {
@@ -295,8 +297,7 @@ const Accounts = () => {
             className="bank-table"
             onRow={(record) => ({
               onClick: () => {
-                setSelectedAccount(record);
-                setCardManageOpen(true);
+                navigate(`/accounts/${record.id}/overview`);
               },
               className: 'cursor-pointer',
             })}

@@ -19,6 +19,7 @@ import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import AccountOverview from "./pages/AccountOverview";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,22 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Accounts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/accounts/:accountId"
+                element={
+                  <ProtectedRoute>
+                    <AccountOverview />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/accounts/:accountId/:section"
+                element={
+                  <ProtectedRoute>
+                    <AccountOverview />
                   </ProtectedRoute>
                 }
               />
