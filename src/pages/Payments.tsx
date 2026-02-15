@@ -64,6 +64,13 @@ const componentMap: Record<string, FC<any>> = {
   mobile_notify: () => <OtherOperations selectedId="mobile_notify" />,
   update_balances: () => <OtherOperations selectedId="update_balances" />,
   insurance: () => <OtherOperations selectedId="insurance" />,
+} as const;
+
+// Create a wrapper for components to handle missing ones
+const getComponent = (componentId: string | undefined): FC => {
+  if (!componentId) return () => <Empty description="Компонент не найден" />;
+  const Component = componentMap[componentId as keyof typeof componentMap];
+  return Component || (() => <Empty description={`Компонент ${componentId} в разработке`} />);
 };
 
 export default function Payments() {
@@ -94,7 +101,7 @@ export default function Payments() {
   }, [selectedCategoryId, filteredItems, selectedItemId]);
 
   const selectedItem = selectedItemId ? findMenuItemById(paymentsMenuStructure, selectedItemId) : null;
-  const ComponentToRender = selectedItem?.componentId ? componentMap[selectedItem.componentId] : null;
+  const ComponentToRender = selectedItem?.componentId ? getComponent(selectedItem.componentId) : null;
 
   // Левая панель - меню
   const renderSidebar = () => (
@@ -120,7 +127,7 @@ export default function Payments() {
       </div>
 
       {/* Список категорий */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto p-2 space-y-1">
         {paymentsMenuStructure.map(category => {
           const Icon = category.icon;
           const isActive = selectedCategoryId === category.id;
@@ -133,22 +140,22 @@ export default function Payments() {
                   setSelectedItemId(null);
                   setMobileDrawerOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-left ${
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-left text-sm ${
                   isActive
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg scale-105 font-semibold'
                     : 'text-gray-700 hover:bg-white hover:shadow-md border border-transparent'
                 }`}
               >
-                {Icon && <Icon className={`text-xl flex-shrink-0 ${isActive ? 'text-white' : 'text-blue-600'}`} />}
+                {Icon && <Icon className={`text-lg flex-shrink-0 ${isActive ? 'text-white' : 'text-blue-600'}`} />}
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold truncate">{category.label}</div>
-                  <div className={`text-xs mt-0.5 ${isActive ? 'text-blue-100' : 'text-gray-400'}`}>
-                    {itemCount} операций
+                  <div className="text-xs font-semibold truncate">{category.label}</div>
+                  <div className={`text-xs mt-0 ${isActive ? 'text-blue-100' : 'text-gray-400'}`}>
+                    {itemCount}
                   </div>
                 </div>
                 {isActive && (
                   <div className="flex-shrink-0">
-                    <div className="bg-white bg-opacity-20 rounded-full p-1">
+                    <div className="bg-white bg-opacity-20 rounded-full p-0.5">
                       <ArrowRightOutlined className="text-white text-xs" />
                     </div>
                   </div>
