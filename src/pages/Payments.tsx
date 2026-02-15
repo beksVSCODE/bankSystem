@@ -103,6 +103,119 @@ export default function Payments() {
   const selectedItem = selectedItemId ? findMenuItemById(paymentsMenuStructure, selectedItemId) : null;
   const ComponentToRender = selectedItem?.componentId ? getComponent(selectedItem.componentId) : null;
 
+  // Левая панель - меню для десктопа
+  const renderDesktopSidebar = () => (
+    <div className="flex flex-col h-full bg-gradient-to-b from-gray-50 to-white border-r border-gray-200">
+      {/* Заголовок */}
+      <div className="p-4 sm:p-6 border-b border-gray-200 bg-white">
+        <h2 className="text-lg font-bold text-gray-900">Платежи и переводы</h2>
+        <p className="text-xs text-gray-500 mt-1">Выберите категорию операции</p>
+      </div>
+
+      {/* Поиск */}
+      <div className="p-4 border-b border-gray-100">
+        <Input
+          placeholder="Поиск операции..."
+          prefix={<SearchOutlined className="text-gray-400" />}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          allowClear
+          size="large"
+          className="rounded-lg font-medium"
+          style={{ borderColor: '#e5e7eb' }}
+        />
+      </div>
+
+      {/* Список категорий */}
+      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        {paymentsMenuStructure.map(category => {
+          const Icon = category.icon;
+          const isActive = selectedCategoryId === category.id;
+          const itemCount = category.items?.length || 0;
+          return (
+            <Tooltip key={category.id} title={category.label} placement="right">
+              <button
+                onClick={() => {
+                  setSelectedCategoryId(category.id);
+                  setSelectedItemId(null);
+                  setMobileDrawerOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-left text-sm ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg scale-105 font-semibold'
+                    : 'text-gray-700 hover:bg-white hover:shadow-md border border-transparent'
+                }`}
+              >
+                {Icon && <Icon className={`text-lg flex-shrink-0 ${isActive ? 'text-white' : 'text-blue-600'}`} />}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-semibold truncate">{category.label}</div>
+                  <div className={`text-xs mt-0 ${isActive ? 'text-blue-100' : 'text-gray-400'}`}>
+                    {itemCount}
+                  </div>
+                </div>
+                {isActive && (
+                  <div className="flex-shrink-0">
+                    <div className="bg-white bg-opacity-20 rounded-full p-0.5">
+                      <ArrowRightOutlined className="text-white text-xs" />
+                    </div>
+                  </div>
+                )}
+                {!isActive && itemCount > 0 && (
+                  <Badge count={itemCount} className="flex-shrink-0" style={{ backgroundColor: '#2563eb' }} />
+                )}
+              </button>
+            </Tooltip>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // Левая панель - меню для мобильной версии (без Tooltip, более удобно для тача)
+  const renderMobileSidebar = () => (
+    <div className="flex flex-col h-full bg-white">
+      {/* Заголовок */}
+      <div className="p-4 border-b border-gray-200 bg-white">
+        <h2 className="text-lg font-bold text-gray-900">Категории</h2>
+        <p className="text-xs text-gray-500 mt-1">Выберите категорию</p>
+      </div>
+
+      {/* Список категорий */}
+      <div className="flex-1 overflow-y-auto">
+        {paymentsMenuStructure.map(category => {
+          const Icon = category.icon;
+          const isActive = selectedCategoryId === category.id;
+          const itemCount = category.items?.length || 0;
+          return (
+            <button
+              key={category.id}
+              onClick={() => {
+                setSelectedCategoryId(category.id);
+                setSelectedItemId(null);
+                setMobileDrawerOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-4 border-b border-gray-100 transition-all text-left ${
+                isActive
+                  ? 'bg-blue-50 border-l-4 border-l-blue-600'
+                  : 'hover:bg-gray-50'
+              }`}
+            >
+              {Icon && <Icon className={`text-xl flex-shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-600'}`} />}
+              <div className="flex-1 min-w-0">
+                <div className={`font-semibold truncate ${isActive ? 'text-blue-900' : 'text-gray-900'}`}>
+                  {category.label}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {itemCount} операций
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   // Левая панель - меню
   const renderSidebar = () => (
     <div className="flex flex-col h-full bg-gradient-to-b from-gray-50 to-white border-r border-gray-200">
@@ -222,7 +335,7 @@ export default function Payments() {
         <div className="flex-1 flex overflow-hidden min-w-0">
         {/* Боковое меню (скрыто на мобильных) */}
           <div className="hidden lg:block w-72 flex-shrink-0">
-            {renderSidebar()}
+            {renderDesktopSidebar()}
           </div>
 
           {/* Drawer для мобильных */}
@@ -235,7 +348,7 @@ export default function Payments() {
             bodyStyle={{ padding: 0 }}
             headerStyle={{ borderBottom: '1px solid #e5e7eb' }}
           >
-            {renderSidebar()}
+            {renderMobileSidebar()}
           </Drawer>
 
           {/* Основная панель с подменю и контентом */}
