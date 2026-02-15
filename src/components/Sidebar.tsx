@@ -11,6 +11,8 @@ import {
   MenuUnfoldOutlined,
   BellOutlined,
   SearchOutlined,
+  SendOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { Badge, Avatar, Tooltip, Popover, List } from 'antd';
 import { useAuthStore } from '@/mock/authStore';
@@ -21,6 +23,8 @@ const navItems = [
   { path: '/dashboard', label: 'Главная', icon: HomeOutlined },
   { path: '/accounts', label: 'Счета', icon: CreditCardOutlined },
   { path: '/transactions', label: 'Операции', icon: UnorderedListOutlined },
+  { path: '/payments', label: 'Платежи и переводы', icon: SendOutlined },
+  { path: '/reports', label: 'Отчеты', icon: FileTextOutlined },
   { path: '/analytics', label: 'Аналитика', icon: PieChartOutlined },
   { path: '/profile', label: 'Профиль', icon: UserOutlined },
 ];
