@@ -1,0 +1,25 @@
+{
+    "name": "FinSim Dashboard",
+    "short_name": "FinSim",
+    "description": "Финансовая панель управления - управляйте своими счетами и транзакциями",
+    "theme_color": "#6366F1",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icons/web-app-manifest-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/web-app-manifest-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
