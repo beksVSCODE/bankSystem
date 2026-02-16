@@ -20,6 +20,7 @@ import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import AccountOverview from "./pages/AccountOverview";
 
 const queryClient = new QueryClient();
 
