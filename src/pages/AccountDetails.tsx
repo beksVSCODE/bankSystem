@@ -11,11 +11,15 @@ import {
   CopyOutlined,
   DollarOutlined,
   HomeOutlined,
+  BgColorsOutlined,
 } from '@ant-design/icons';
 import { MainLayout } from '@/components/MainLayout';
+import { TemplateManagerModal } from '@/components/TemplateManagerModal';
+import { TemplateQuickAccess } from '@/components/TemplateQuickAccess';
 import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseFinancialStore';
 import { formatCurrency } from '@/mock/data';
 import { accountActions, getSubActionsByParentId, getActionById } from '@/mock/accountActions';
+import { useTemplateStore, type AccountTemplate } from '@/mock/templateStore';
 import type { Account } from '@/mock/types';
 import {
   StatementDownload,
@@ -112,6 +116,7 @@ const AccountDetails = () => {
   const accounts = useFinancialStore(state => state.accounts);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [breadcrumbPath, setBreadcrumbPath] = useState<string[]>([]);
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
 
   const account = useMemo(
     () => accounts.find((acc) => acc.id === accountId),
@@ -153,6 +158,15 @@ const AccountDetails = () => {
   const handleActionClick = (actionId: string) => {
     setActiveCategory(actionId);
     setBreadcrumbPath([...breadcrumbPath, actionId]);
+  };
+
+  const handleTemplateSelect = (template: AccountTemplate) => {
+    // Применить шаблон - переместить к первому действию из шаблона
+    if (template.actions.length > 0) {
+      const firstAction = template.actions[0];
+      handleActionClick(firstAction);
+      message.success(`Шаблон "${template.name}" применен`);
+    }
   };
 
   const handleBreadcrumbClick = (index: number) => {
@@ -240,7 +254,14 @@ const AccountDetails = () => {
         {/* Основная информация о счете */}
         {!activeCategory && (
           <>
-            <Card className="mb-6">
+            {/* Шаблоны */}
+            <TemplateQuickAccess
+              accountId={account.id}
+              onTemplateSelect={handleTemplateSelect}
+              onManageTemplates={() => setTemplateModalOpen(true)}
+            />
+
+            <Card className="mb-6 mt-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex-1">
                   <Space direction="vertical" size="small" className="w-full">
@@ -346,6 +367,13 @@ const AccountDetails = () => {
           </>
         )}
       </div>
+
+      {/* Template Manager Modal */}
+      <TemplateManagerModal
+        open={templateModalOpen}
+        onClose={() => setTemplateModalOpen(false)}
+        accountId={account.id}
+      />
     </MainLayout>
   );
 };
