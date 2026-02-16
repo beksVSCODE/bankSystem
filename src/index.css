@@ -32,62 +32,72 @@
 
 
     :root {
-        /* Core Banking Colors - Sovcombank Blue */
-        --background: 210 20% 98%;
-        --foreground: 220 20% 10%;
+        /* Modern Banking Colors - Premium Purple & Blue */
+        --background: 240 20% 99%;
+        --foreground: 240 10% 10%;
 
         --card: 0 0% 100%;
-        --card-foreground: 220 20% 10%;
+        --card-foreground: 240 10% 10%;
 
         --popover: 0 0% 100%;
-        --popover-foreground: 220 20% 10%;
+        --popover-foreground: 240 10% 10%;
 
-        /* Primary - Sovcombank Blue #0050B3 */
-        --primary: 209 100% 35%;
+        /* Primary - Deep Purple #6366F1 */
+        --primary: 239 84% 67%;
         --primary-foreground: 0 0% 100%;
 
-        /* Secondary - Light Blue */
-        --secondary: 210 40% 96%;
-        --secondary-foreground: 209 100% 35%;
+        /* Secondary - Soft Purple */
+        --secondary: 240 30% 96%;
+        --secondary-foreground: 239 84% 67%;
 
-        --muted: 210 20% 96%;
-        --muted-foreground: 215 16% 47%;
+        --muted: 240 20% 97%;
+        --muted-foreground: 240 5% 50%;
 
-        --accent: 209 100% 95%;
-        --accent-foreground: 209 100% 35%;
+        --accent: 239 84% 95%;
+        --accent-foreground: 239 84% 67%;
 
-        --destructive: 0 84% 60%;
+        --destructive: 0 72% 51%;
         --destructive-foreground: 0 0% 100%;
 
-        /* Success - for positive amounts */
-        --success: 142 76% 36%;
+        /* Success - Emerald Green */
+        --success: 158 64% 52%;
         --success-foreground: 0 0% 100%;
 
-        /* Warning - for pending states */
-        --warning: 38 92% 50%;
+        /* Warning - Amber */
+        --warning: 43 96% 56%;
         --warning-foreground: 0 0% 100%;
 
-        --border: 214 32% 91%;
-        --input: 214 32% 91%;
-        --ring: 209 100% 35%;
+        /* Info - Cyan */
+        --info: 199 89% 48%;
+        --info-foreground: 0 0% 100%;
 
-        --radius: 0.5rem;
+        --border: 240 20% 92%;
+        --input: 240 20% 94%;
+        --ring: 239 84% 67%;
 
-        /* Sidebar */
-        --sidebar-background: 209 100% 35%;
-        --sidebar-foreground: 210 40% 98%;
-        --sidebar-primary: 0 0% 100%;
-        --sidebar-primary-foreground: 209 100% 35%;
-        --sidebar-accent: 209 100% 40%;
+        --radius: 0.75rem;
+
+        /* Sidebar - Modern Gradient */
+        --sidebar-background: 240 10% 10%;
+        --sidebar-foreground: 0 0% 98%;
+        --sidebar-primary: 239 84% 67%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 240 15% 15%;
         --sidebar-accent-foreground: 0 0% 100%;
-        --sidebar-border: 209 100% 30%;
-        --sidebar-ring: 0 0% 100%;
+        --sidebar-border: 240 10% 18%;
+        --sidebar-ring: 239 84% 67%;
 
-        /* Banking-specific tokens */
-        --bank-gradient: linear-gradient(135deg, hsl(209, 100%, 35%) 0%, hsl(209, 100%, 25%) 100%);
-        --card-gradient: linear-gradient(135deg, hsl(209, 100%, 40%) 0%, hsl(209, 100%, 30%) 100%);
-        --shadow-bank: 0 4px 20px -4px hsl(209 100% 35% / 0.15);
-        --shadow-card: 0 2px 12px -2px hsl(220 20% 10% / 0.08);
+        /* Modern Banking-specific tokens */
+        --bank-gradient: linear-gradient(135deg, hsl(239, 84%, 67%) 0%, hsl(262, 83%, 58%) 100%);
+        --card-gradient: linear-gradient(135deg, hsl(239, 84%, 70%) 0%, hsl(262, 83%, 62%) 100%);
+        --glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --shadow-bank: 0 8px 30px -6px rgba(99, 102, 241, 0.2);
+        --shadow-card: 0 2px 12px -2px rgb(0 0 0 / 0.08);
+        --shadow-hover: 0 12px 40px -8px rgba(99, 102, 241, 0.25);
     }
 
     .dark {
@@ -188,7 +198,7 @@
         pointer-events: none;
     }
 
-    /* Animated gradient background */
+    /* Animated gradient background - Modern Purple */
     @keyframes gradient-shift {
 
         0%,
@@ -201,27 +211,53 @@
         }
     }
 
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+
+        100% {
+            background-position: 200% 0;
+        }
+    }
+
     .bank-card-animated {
         background: linear-gradient(135deg,
-                hsl(209, 100%, 35%) 0%,
-                hsl(209, 100%, 25%) 25%,
-                hsl(209, 100%, 35%) 50%,
-                hsl(209, 100%, 25%) 75%,
-                hsl(209, 100%, 35%) 100%);
+                hsl(239, 84%, 67%) 0%,
+                hsl(262, 83%, 58%) 25%,
+                hsl(239, 84%, 67%) 50%,
+                hsl(262, 83%, 58%) 75%,
+                hsl(239, 84%, 67%) 100%);
         background-size: 200% 200%;
         animation: gradient-shift 15s ease infinite;
     }
 
-    /* Stats card */
+    /* Stats card - Modern glass morphism */
     .stats-card {
-        @apply bg-card rounded-2xl p-5 border border-border relative;
-        box-shadow: var(--shadow-card);
+        @apply bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 relative overflow-hidden;
+        box-shadow: 0 4px 24px -2px rgba(99, 102, 241, 0.08);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s;
+    }
+
+    .stats-card:hover::before {
+        left: 100%;
+    }
+
     .stats-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px -8px hsl(220 20% 10% / 0.15);
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 12px 40px -8px rgba(99, 102, 241, 0.2);
+        border-color: rgba(99, 102, 241, 0.2);
     }
 
     .stats-card::after {
@@ -230,7 +266,7 @@
         inset: 0;
         border-radius: inherit;
         padding: 1px;
-        background: linear-gradient(135deg, transparent, hsl(var(--primary) / 0.1), transparent);
+        background: linear-gradient(135deg, transparent, hsl(239, 84%, 67% / 0.2), transparent);
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
@@ -242,50 +278,80 @@
         opacity: 1;
     }
 
-    /* Table styles */
+    /* Table styles - Modern and clean */
     .bank-table {
         @apply w-full;
     }
 
     .bank-table th {
-        @apply text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 px-4;
+        @apply text-left text-xs font-semibold text-gray-500 uppercase tracking-wider py-4 px-6;
+        background: linear-gradient(to bottom, #F9FAFB 0%, #F3F4F6 100%);
     }
 
     .bank-table td {
-        @apply py-4 px-4 border-b border-border;
+        @apply py-4 px-6 border-b border-gray-100;
+        transition: all 0.2s ease;
     }
 
     .bank-table tr:hover td {
-        @apply bg-muted/50;
+        @apply bg-purple-50/50;
     }
 
-    /* Amount formatting */
+    .bank-table tr {
+        transition: all 0.2s ease;
+    }
+
+    .bank-table tr:hover {
+        box-shadow: 0 2px 8px -2px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Amount formatting with modern colors */
     .amount-positive {
-        @apply text-success font-medium;
+        @apply text-emerald-600 font-semibold;
     }
 
     .amount-negative {
-        @apply text-destructive font-medium;
+        @apply text-rose-600 font-semibold;
     }
 
-    /* Navigation link */
+    /* Navigation link - Modern sidebar */
     .nav-link {
-        @apply flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground/80 transition-all duration-200;
+        @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground/70 transition-all duration-200;
+        position: relative;
+    }
+
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 0;
+        background: hsl(239, 84%, 67%);
+        border-radius: 0 4px 4px 0;
+        transition: height 0.2s ease;
     }
 
     .nav-link:hover {
-        @apply bg-sidebar-accent text-sidebar-foreground;
+        @apply bg-sidebar-accent text-sidebar-foreground/90;
     }
 
     .nav-link.active {
-        @apply bg-white/10 text-sidebar-foreground font-medium;
+        @apply bg-purple-500/10 text-purple-400 font-medium;
     }
 
-    /* Button variants */
+    .nav-link.active::before {
+        height: 24px;
+    }
+
+    /* Button variants - Modern with subtle effects */
     .btn-bank {
-        @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200;
-        @apply bg-primary text-primary-foreground hover:bg-primary/90;
-        @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2;
+        @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200;
+        @apply bg-gradient-to-r from-purple-600 to-indigo-600 text-white;
+        @apply hover:from-purple-700 hover:to-indigo-700 hover:shadow-lg hover:shadow-purple-500/30;
+        @apply focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:ring-offset-2;
+        @apply active:scale-95;
     }
 
     .btn-bank-outline {
@@ -911,5 +977,128 @@
     /* Mobile notifications popover - higher z-index */
     .mobile-notifications-popover .ant-popover {
         z-index: 60;
+    }
+
+    /* Modern utility classes */
+    .gradient-purple {
+        background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    }
+
+    .gradient-emerald {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+
+    .gradient-rose {
+        background: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%);
+    }
+
+    .gradient-amber {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+
+    .gradient-cyan {
+        background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+    }
+
+    /* Modern card hover effect */
+    .card-modern {
+        @apply bg-white rounded-2xl border border-gray-100 shadow-sm transition-all duration-300;
+    }
+
+    .card-modern:hover {
+        @apply shadow-xl border-purple-200 -translate-y-1;
+    }
+
+    /* Glass effect */
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Floating animation */
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Pulse glow effect */
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.8);
+        }
+    }
+
+    .pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    /* Skeleton loading modern */
+    .skeleton-modern {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    /* Modern scrollbar */
+    .modern-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .modern-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .modern-scrollbar::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 10px;
+    }
+
+    .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    /* Tag modern styles */
+    .tag-modern {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    }
+
+    .tag-success {
+        @apply bg-emerald-100 text-emerald-700;
+    }
+
+    .tag-warning {
+        @apply bg-amber-100 text-amber-700;
+    }
+
+    .tag-error {
+        @apply bg-rose-100 text-rose-700;
+    }
+
+    .tag-info {
+        @apply bg-cyan-100 text-cyan-700;
+    }
+
+    .tag-purple {
+        @apply bg-purple-100 text-purple-700;
     }
 }

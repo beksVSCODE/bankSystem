@@ -245,10 +245,10 @@ const Accounts = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="stats-card" bordered={false}>
+          <Card className="stats-card hover:shadow-xl transition-all duration-300 group" bordered={false}>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <WalletOutlined className="text-2xl text-primary" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <WalletOutlined className="text-2xl text-white" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Всего в рублях</p>
@@ -259,10 +259,10 @@ const Accounts = () => {
             </div>
           </Card>
           
-          <Card className="stats-card" bordered={false}>
+          <Card className="stats-card hover:shadow-xl transition-all duration-300 group" bordered={false}>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
-                <BankOutlined className="text-2xl text-success" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <BankOutlined className="text-2xl text-white" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Всего в долларах</p>
@@ -273,10 +273,10 @@ const Accounts = () => {
             </div>
           </Card>
           
-          <Card className="stats-card" bordered={false}>
+          <Card className="stats-card hover:shadow-xl transition-all duration-300 group" bordered={false}>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
-                <CreditCardOutlined className="text-2xl text-warning" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <CreditCardOutlined className="text-2xl text-white" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Всего счетов</p>
@@ -286,24 +286,24 @@ const Accounts = () => {
           </Card>
 
           <Card 
-            className="stats-card cursor-pointer hover:border-primary/30 transition-colors" 
+            className="stats-card cursor-pointer hover:border-purple-400/50 hover:shadow-xl transition-all duration-300 group" 
             bordered={false}
             onClick={() => setExchangeOpen(true)}
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
-                <SwapOutlined className="text-2xl text-primary" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <SwapOutlined className="text-2xl text-white" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Обмен валюты</p>
-                <p className="text-sm font-medium text-primary">Курсы ЦБ РФ →</p>
+                <p className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Курсы ЦБ РФ →</p>
               </div>
             </div>
           </Card>
         </div>
 
         {/* Accounts Table */}
-        <Card className="border-0 shadow-card" bordered={false}>
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-modern" bordered={false}>
           <Table
             columns={columns}
             dataSource={accounts}

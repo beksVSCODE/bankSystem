@@ -203,7 +203,9 @@ const AccountDetails = () => {
         <Breadcrumb className="mb-4">
           <Breadcrumb.Item>
             <a onClick={() => handleBreadcrumbClick(-1)} className="flex items-center gap-1">
-              <HomeOutlined />
+              <HomeOutlined/>
+              <span> </span>
+              <span> </span>
               <span>Счета</span>
             </a>
           </Breadcrumb.Item>

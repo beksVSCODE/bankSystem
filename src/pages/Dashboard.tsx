@@ -95,17 +95,17 @@ const Dashboard = () => {
         {/* Balance Card */}
         <div className="bank-card text-white relative overflow-hidden group">
           {/* Animated background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 transition-transform duration-500 group-hover:scale-105"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-900 transition-transform duration-500 group-hover:scale-105"></div>
           
           {/* Floating circles decoration */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-400/10 rounded-full blur-3xl" style={{ animation: 'float 8s ease-in-out infinite 1s' }}></div>
           
           <div className="relative z-10 flex flex-col gap-4 sm:gap-6">
             <div>
               <p className="text-white/70 text-xs sm:text-sm mb-2 sm:mb-3 flex items-center gap-2">
                 Общий баланс
-                <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                <span className="inline-block w-2 h-2 bg-emerald-400 rounded-full animate-pulse-glow"></span>
               </p>
               <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 tracking-tight break-words">
                 {formatCurrency(totalBalance)}
@@ -119,7 +119,7 @@ const Dashboard = () => {
                     onChange={(value) => setActiveTab(value as any)}
                     options={[
                       { label: 'Все', value: 'all' },
-                      { label: 'АУ', value: 'investment' },
+                      { label: 'Кабинет АУ по физ лицам', value: 'investment' },
                       { label: 'Карты', value: 'cards' },
                       { label: 'Личные', value: 'personal' },
                       { label: 'Бизнес', value: 'business' },
@@ -256,10 +256,13 @@ const Dashboard = () => {
         {/* Chart and Recent Transactions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Chart */}
-          <Card className="lg:col-span-2 border-0 shadow-card" bordered={false}>
+          <Card className="lg:col-span-2 border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-modern" bordered={false}>
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold text-foreground">Статистика</h3>
-              <Button type="link" onClick={() => navigate('/analytics')} className="p-0 text-xs sm:text-sm">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
+                <RiseOutlined className="text-purple-500" />
+                Статистика
+              </h3>
+              <Button type="link" onClick={() => navigate('/analytics')} className="p-0 text-xs sm:text-sm hover:text-purple-600">
                 Подробнее →
               </Button>
             </div>
@@ -268,22 +271,23 @@ const Dashboard = () => {
                 <AreaChart data={mockMonthlyAnalytics}>
                   <defs>
                     <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.05} />
                     </linearGradient>
                     <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.5} />
                   <XAxis dataKey="period" stroke="#9CA3AF" fontSize={12} />
                   <YAxis stroke="#9CA3AF" fontSize={12} tickFormatter={(v) => `${v / 1000}k`} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
                     }}
                     formatter={(value: number) => formatCurrency(value)}
                   />
@@ -292,7 +296,7 @@ const Dashboard = () => {
                     dataKey="income"
                     name="Доходы"
                     stroke="#10B981"
-                    strokeWidth={2}
+                    strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorIncome)"
                   />
@@ -301,7 +305,7 @@ const Dashboard = () => {
                     dataKey="expense"
                     name="Расходы"
                     stroke="#EF4444"
-                    strokeWidth={2}
+                    strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorExpense)"
                   />
@@ -311,10 +315,10 @@ const Dashboard = () => {
           </Card>
 
           {/* Recent Transactions */}
-          <Card className="border-0 shadow-card hover:shadow-lg transition-shadow duration-300" bordered={false}>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-modern" bordered={false}>
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <h3 className="text-base sm:text-lg font-semibold text-foreground">Последние операции</h3>
-              <Button type="link" onClick={() => navigate('/transactions')} className="p-0 text-xs sm:text-sm">
+              <Button type="link" onClick={() => navigate('/transactions')} className="p-0 text-xs sm:text-sm hover:text-purple-600">
                 Все →
               </Button>
             </div>
@@ -324,14 +328,14 @@ const Dashboard = () => {
                 return (
                   <div
                     key={tx.id}
-                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-all duration-200 cursor-pointer group"
+                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 active:scale-[0.98] transition-all duration-200 cursor-pointer group"
                     onClick={() => navigate('/transactions')}
                     style={{
                       animationDelay: `${index * 50}ms`,
                     }}
                   >
                     <div
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-md"
                       style={{ backgroundColor: `${catInfo.color}15` }}
                     >
                       <span style={{ color: catInfo.color }} className="text-sm sm:text-base transition-transform duration-300 group-hover:rotate-12">

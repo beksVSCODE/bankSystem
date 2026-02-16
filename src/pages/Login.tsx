@@ -39,43 +39,48 @@ const Login = () => {
     <div className="min-h-screen flex">
       {/* Left side - Branding */}
       <div 
-        className="hidden lg:flex lg:w-1/2 items-center justify-center p-12"
-        style={{ background: 'var(--bank-gradient)' }}
+        className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' }}
       >
-        <div className="max-w-md text-white text-center">
-          <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-8">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-purple-900/20"></div>
+        <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl" style={{ animation: 'float 8s ease-in-out infinite 1s' }}></div>
+        
+        <div className="max-w-md text-white text-center relative z-10">
+          <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-md flex items-center justify-center mx-auto mb-8 ring-2 ring-white/30 shadow-2xl">
             <BankOutlined className="text-5xl text-white" />
           </div>
-          <h1 className="text-4xl font-bold mb-4">СовкомБанк</h1>
-          <p className="text-xl text-white/80 mb-8">
-            Интернет-банк для управления вашими финансами
+          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent">FinSim</h1>
+          <p className="text-xl text-white/90 mb-8 font-medium">
+            Современный интернет-банк для управления вашими финансами
           </p>
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+            <div className="p-4 rounded-xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20">
               <div className="text-2xl font-bold mb-1">24/7</div>
-              <div className="text-xs text-white/70">Доступ</div>
+              <div className="text-xs text-white/80">Доступ</div>
             </div>
-            <div className="p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+            <div className="p-4 rounded-xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20">
               <div className="text-2xl font-bold mb-1">0 ₽</div>
-              <div className="text-xs text-white/70">Комиссия</div>
+              <div className="text-xs text-white/80">Комиссия</div>
             </div>
-            <div className="p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+            <div className="p-4 rounded-xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20">
               <div className="text-2xl font-bold mb-1">5 мин</div>
-              <div className="text-xs text-white/70">Переводы</div>
+              <div className="text-xs text-white/80">Переводы</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Right side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-background">
-        <Card className="w-full max-w-md shadow-card border-0" bordered={false}>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/30">
+        <Card className="w-full max-w-md shadow-2xl border-0 card-modern" bordered={false}>
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-              <BankOutlined className="text-3xl text-primary-foreground" />
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <BankOutlined className="text-3xl text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">СовкомБанк</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">FinSim</h1>
           </div>
 
           <div className="text-center mb-8">
@@ -123,7 +128,7 @@ const Login = () => {
                 <Form.Item name="remember" valuePropName="checked" noStyle>
                   <Checkbox>Запомнить меня</Checkbox>
                 </Form.Item>
-                <Button type="link" className="p-0 text-primary">
+                <Button type="link" className="p-0 text-purple-600 hover:text-purple-700">
                   Забыли пароль?
                 </Button>
               </div>
@@ -135,7 +140,11 @@ const Login = () => {
                 htmlType="submit"
                 loading={loading}
                 block
-                className="h-12 text-base font-medium"
+                className="h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                  border: 'none',
+                }}
               >
                 Войти
               </Button>
@@ -143,7 +152,7 @@ const Login = () => {
 
             <div className="text-center text-muted-foreground">
               Нет аккаунта?{' '}
-              <Button type="link" className="p-0 text-primary">
+              <Button type="link" className="p-0 text-purple-600 hover:text-purple-700">
                 Зарегистрироваться
               </Button>
             </div>

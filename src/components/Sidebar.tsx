@@ -93,23 +93,24 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
   return (
     <>
       <aside 
-        className={`fixed ${isMobile ? 'right-0' : 'left-0'} top-0 h-full bg-sidebar text-sidebar-foreground transition-all duration-300 z-50 
-          ${collapsed ? 'w-20' : 'w-64'} flex flex-col shadow-2xl overflow-y-auto backdrop-blur-sm`}
+        className={`fixed ${isMobile ? 'right-0' : 'left-0'} top-0 h-full text-white transition-all duration-300 z-50 
+          ${collapsed ? 'w-20' : 'w-64'} flex flex-col shadow-2xl overflow-y-auto`}
         style={{
-          background: 'linear-gradient(180deg, rgba(0, 81, 168, 0.97) 0%, rgba(0, 81, 168, 1) 100%)',
+          background: 'linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)',
+          boxShadow: '4px 0 24px rgba(99, 102, 241, 0.15)',
         }}
       >
         {/* Decorative gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-purple-500/10 pointer-events-none"></div>
         
         {/* Logo */}
         <div className="relative flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center ring-2 ring-white/30 shadow-lg">
-              <span className="text-white font-bold text-base sm:text-lg">S</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center ring-2 ring-purple-400/30 shadow-lg">
+              <span className="text-white font-bold text-base sm:text-lg">F</span>
             </div>
             {!collapsed && (
-              <span className="font-semibold text-base sm:text-lg tracking-tight animate-fadeIn">SovcomBank</span>
+              <span className="font-semibold text-base sm:text-lg tracking-tight animate-fadeIn">FinSim</span>
             )}
           </div>
           <button
@@ -125,13 +126,13 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
           <Tooltip title={collapsed ? 'Поиск (⌘K)' : ''} placement="right">
             <button
               onClick={() => setSearchOpen(true)}
-              className={`nav-link w-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-sm sm:text-base transition-all duration-200 ${collapsed ? 'justify-center' : ''} backdrop-blur-sm border border-white/20`}
+              className={`nav-link w-full bg-white/5 hover:bg-white/10 active:bg-white/15 text-sm sm:text-base transition-all duration-200 ${collapsed ? 'justify-center' : ''} backdrop-blur-sm border border-white/10 hover:border-purple-400/30`}
             >
               <SearchOutlined className="text-lg" />
               {!collapsed && (
                 <>
                   <span className="flex-1 text-left text-sm sm:text-base">Поиск...</span>
-                  <kbd className="px-1 sm:px-1.5 py-0.5 rounded bg-white/20 text-[10px] sm:text-xs shadow-sm">⌘K</kbd>
+                  <kbd className="px-1 sm:px-1.5 py-0.5 rounded bg-white/10 text-[10px] sm:text-xs shadow-sm border border-white/10">⌘K</kbd>
                 </>
               )}
             </button>
@@ -139,7 +140,7 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
         </div>
 
         {/* Navigation */}
-        <nav className="relative flex-1 py-3 sm:py-4 px-2 sm:px-3 overflow-y-auto">
+        <nav className="relative flex-1 py-3 sm:py-4 px-2 sm:px-3 overflow-y-auto modern-scrollbar">
           <ul className="space-y-0.5 sm:space-y-1">
             {navItems.map((item, index) => {
               const Icon = item.icon;
@@ -157,13 +158,17 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
                   <Tooltip title={collapsed ? item.label : ''} placement="right">
                     <NavLink
                       to={item.path}
-                      className={`nav-link text-sm sm:text-base group relative ${isActive ? 'active bg-white/20 shadow-md' : 'hover:bg-white/10 active:bg-white/20'} transition-all duration-200`}
+                      className={`nav-link text-sm sm:text-base group relative ${
+                        isActive 
+                          ? 'active bg-gradient-to-r from-purple-500/20 to-indigo-500/20 shadow-md border-l-4 border-purple-400' 
+                          : 'hover:bg-white/5 active:bg-white/10 border-l-4 border-transparent'
+                      } transition-all duration-200`}
                     >
-                      {isActive && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full shadow-lg"></span>
-                      )}
                       <Icon className="text-base sm:text-lg transition-transform duration-200 group-hover:scale-110" />
                       {!collapsed && <span className="transition-transform duration-200">{item.label}</span>}
+                      {isActive && !collapsed && (
+                        <div className="absolute right-2 w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse-glow"></div>
+                      )}
                     </NavLink>
                   </Tooltip>
                 </li>
@@ -173,12 +178,12 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
         </nav>
 
         {/* Bottom section */}
-        <div className="relative p-2 sm:p-3 border-t border-white/10 space-y-1.5 sm:space-y-2 shrink-0 backdrop-blur-sm">
+        <div className="relative p-2 sm:p-3 border-t border-white/10 space-y-1.5 sm:space-y-2 shrink-0 backdrop-blur-sm bg-white/5">
           {/* Notifications */}
           <Popover content={notificationContent} title="Уведомления" trigger="click" placement="rightTop">
             <button className={`nav-link w-full text-sm sm:text-base hover:bg-white/10 active:bg-white/20 transition-all duration-200 ${collapsed ? 'justify-center' : ''}`}>
               <Badge count={unreadCount} size="small" offset={[-2, 2]}>
-                <BellOutlined className="text-base sm:text-lg text-sidebar-foreground" />
+                <BellOutlined className="text-base sm:text-lg" />
               </Badge>
               {!collapsed && <span>Уведомления</span>}
             </button>
@@ -186,15 +191,15 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
 
           {/* User */}
           {!collapsed && (
-            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 rounded-lg backdrop-blur-sm">
-              <Avatar size={32} className="bg-white/30 backdrop-blur-sm sm:w-9 sm:h-9 ring-2 ring-white/40">
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 rounded-lg backdrop-blur-sm ring-1 ring-white/10 hover:ring-purple-400/30 transition-all duration-200">
+              <Avatar size={32} className="bg-gradient-to-br from-purple-500 to-indigo-600 sm:w-9 sm:h-9 ring-2 ring-white/20">
                 {mockUser.firstName[0]}{mockUser.lastName[0]}
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
                   {mockUser.firstName} {mockUser.lastName}
                 </p>
-                <p className="text-xs text-sidebar-foreground/60 truncate">
+                <p className="text-xs text-white/60 truncate">
                   {mockUser.email}
                 </p>
               </div>
@@ -205,7 +210,7 @@ export const Sidebar = ({ onCollapsedChange }: SidebarProps) => {
           <Tooltip title={collapsed ? 'Выйти' : ''} placement="right">
             <button
               onClick={handleLogout}
-              className={`nav-link w-full text-red-300 hover:text-red-200 hover:bg-red-500/20 ${collapsed ? 'justify-center' : ''}`}
+              className={`nav-link w-full text-red-300 hover:text-red-200 hover:bg-red-500/20 active:bg-red-500/30 transition-all duration-200 ${collapsed ? 'justify-center' : ''}`}
             >
               <LogoutOutlined className="text-lg" />
               {!collapsed && <span>Выйти</span>}

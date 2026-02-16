@@ -24,16 +24,43 @@ import AccountOverview from "./pages/AccountOverview";
 
 const queryClient = new QueryClient();
 
-// Ant Design theme configuration
+// Ant Design theme configuration - Modern Banking Theme
 const antTheme = {
   token: {
-    colorPrimary: "#0050B3",
+    colorPrimary: "#6366F1",
     colorSuccess: "#10B981",
     colorWarning: "#F59E0B",
     colorError: "#EF4444",
-    colorInfo: "#3B82F6",
-    borderRadius: 8,
+    colorInfo: "#06B6D4",
+    borderRadius: 12,
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    fontSize: 14,
+    colorBgContainer: "#FFFFFF",
+    colorBorder: "#E5E7EB",
+    boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    boxShadowSecondary: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+  },
+  components: {
+    Card: {
+      borderRadiusLG: 16,
+      boxShadowTertiary: "0 2px 12px -2px rgba(0, 0, 0, 0.08)",
+    },
+    Button: {
+      borderRadiusLG: 10,
+      controlHeight: 40,
+      controlHeightLG: 48,
+      fontWeight: 500,
+    },
+    Input: {
+      borderRadiusLG: 10,
+      controlHeight: 40,
+      controlHeightLG: 48,
+    },
+    Table: {
+      borderRadiusLG: 12,
+      headerBg: "#F9FAFB",
+      headerSplitColor: "transparent",
+    },
   },
 };
 

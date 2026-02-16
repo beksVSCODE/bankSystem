@@ -27,24 +27,25 @@ export const MobileHeader = () => {
 
   return (
     <>
-      <header className="lg:hidden sticky top-0 left-0 right-0 bg-sidebar z-50 shadow-lg">
+      <header className="lg:hidden sticky top-0 left-0 right-0 z-50 shadow-2xl">
         <div 
           className="relative"
           style={{
-            background: 'linear-gradient(180deg, rgb(0, 81, 168) 0%, rgb(0, 81, 168) 100%)',
+            background: 'linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)',
+            boxShadow: '0 4px 24px rgba(99, 102, 241, 0.15)',
           }}
         >
-          {/* Solid opaque background */}
-          <div className="absolute inset-0 bg-blue-700 opacity-0"></div>
+          {/* Decorative gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-purple-500/10 pointer-events-none"></div>
           
           {/* Top row: Logo and Bell */}
           <div className="relative flex items-center justify-between px-4 py-3">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center ring-2 ring-white/30 shadow-lg">
-                <span className="text-white font-bold text-base">S</span>
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center ring-2 ring-purple-400/30 shadow-lg">
+                <span className="text-white font-bold text-base">F</span>
               </div>
-              <span className="font-semibold text-base tracking-tight text-white">SovcomBank</span>
+              <span className="font-semibold text-base tracking-tight text-white">FinSim</span>
             </div>
 
             {/* Bell Icon with Badge */}
@@ -69,11 +70,11 @@ export const MobileHeader = () => {
           <div className="relative px-4 pb-3">
             <button
               onClick={() => setSearchOpen(true)}
-              className="w-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-sm transition-all duration-200 backdrop-blur-sm border border-white/20 rounded-lg px-3 py-2 flex items-center gap-2"
+              className="w-full bg-white/5 hover:bg-white/10 active:bg-white/15 text-sm transition-all duration-200 backdrop-blur-sm border border-white/10 hover:border-purple-400/30 rounded-lg px-3 py-2 flex items-center gap-2"
             >
               <SearchOutlined className="text-base text-white/70" />
               <span className="flex-1 text-left text-sm text-white/70">Поиск...</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-white/20 text-xs text-white/60 shadow-sm">⌘K</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-xs text-white/60 shadow-sm border border-white/10">⌘K</kbd>
             </button>
           </div>
         </div>
