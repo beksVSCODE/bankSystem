@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Button, Table, Tag, message, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import {
@@ -24,6 +25,7 @@ import { useSupabaseFinancialStore as useFinancialStore } from '@/mock/supabaseF
 import type { Account, Card } from '@/mock/types';
 
 const Accounts = () => {
+  const navigate = useNavigate();
   const accounts = useFinancialStore(state => state.accounts);
   const cards = useFinancialStore(state => state.cards);
   const [showBalances, setShowBalances] = useState(true);
@@ -134,6 +136,9 @@ const Accounts = () => {
           </div>
         </div>
       ),
+      onCell: (record: Account) => ({
+        onClick: () => navigate(`/accounts/${record.id}`),
+      }),
     },
     {
       title: 'Тип',
@@ -141,6 +146,9 @@ const Accounts = () => {
       render: (_: unknown, record: Account) => (
         <Tag color="blue">{getAccountTypeLabel(record.accountType)}</Tag>
       ),
+      onCell: (record: Account) => ({
+        onClick: () => navigate(`/accounts/${record.id}`),
+      }),
     },
     {
       title: 'Валюта',
@@ -149,6 +157,9 @@ const Accounts = () => {
       render: (currency: string) => (
         <Tag>{currency}</Tag>
       ),
+      onCell: (record: Account) => ({
+        onClick: () => navigate(`/accounts/${record.id}`),
+      }),
     },
     {
       title: 'Баланс',
@@ -159,6 +170,9 @@ const Accounts = () => {
           {showBalances ? formatCurrency(record.balance, record.currency) : '••••••'}
         </span>
       ),
+      onCell: (record: Account) => ({
+        onClick: () => navigate(`/accounts/${record.id}`),
+      }),
     },
     {
       title: 'Статус',
@@ -168,6 +182,9 @@ const Accounts = () => {
           {record.isActive ? 'Активен' : 'Заблокирован'}
         </Tag>
       ),
+      onCell: (record: Account) => ({
+        onClick: () => navigate(`/accounts/${record.id}`),
+      }),
     },
     {
       title: '',
@@ -293,13 +310,6 @@ const Accounts = () => {
             rowKey="id"
             pagination={false}
             className="bank-table"
-            onRow={(record) => ({
-              onClick: () => {
-                setSelectedAccount(record);
-                setCardManageOpen(true);
-              },
-              className: 'cursor-pointer',
-            })}
           />
         </Card>
       </div>

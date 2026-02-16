@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Accounts from "./pages/Accounts";
+import AccountDetails from "./pages/AccountDetails";
 import Transactions from "./pages/Transactions";
 import Payments from "./pages/Payments";
 import Reports from "./pages/Reports";
@@ -82,6 +83,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Accounts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/accounts/:accountId"
+                element={
+                  <ProtectedRoute>
+                    <AccountDetails />
                   </ProtectedRoute>
                 }
               />
