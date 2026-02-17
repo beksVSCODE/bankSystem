@@ -285,25 +285,110 @@ const Transactions = () => {
             )}
           </div>
 
-          <Table
-            columns={columns}
-            dataSource={filteredTransactions}
-            rowKey="id"
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} из ${total}`,
-            }}
-            className="bank-table"
-            scroll={{ x: 900 }}
-            onRow={(record) => ({
-              onClick: () => {
-                setSelectedTransaction(record);
-                setDetailOpen(true);
-              },
-              className: 'cursor-pointer',
-            })}
-          />
+          {/* Desktop Table */}
+          <div className="hidden md:block">
+            <Table
+              columns={columns}
+              dataSource={filteredTransactions}
+              rowKey="id"
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} из ${total}`,
+              }}
+              className="bank-table"
+              onRow={(record) => ({
+                onClick: () => {
+                  setSelectedTransaction(record);
+                  setDetailOpen(true);
+                },
+                className: 'cursor-pointer',
+              })}
+            />
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {filteredTransactions.length > 0 ? (
+              filteredTransactions.slice(0, 20).map(tx => {
+                const catInfo = categoryInfo[tx.category] || categoryInfo.other;
+                const account = accounts.find(acc => acc.id === tx.accountId);
+                const statusColors = {
+                  completed: 'green',
+                  pending: 'orange',
+                  failed: 'red',
+                };
+                const statusLabels = {
+                  completed: 'Выполнено',
+                  pending: 'В обработке',
+                  failed: 'Ошибка',
+                };
+                
+                return (
+                  <div
+                    key={tx.id}
+                    className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-100"
+                    onClick={() => {
+                      setSelectedTransaction(tx);
+                      setDetailOpen(true);
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Icon */}
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${catInfo.color}15` }}
+                      >
+                        {tx.type === 'income' ? (
+                          <ArrowDownOutlined style={{ color: catInfo.color }} />
+                        ) : (
+                          <ArrowUpOutlined style={{ color: catInfo.color }} />
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="font-medium text-foreground truncate">{tx.description}</p>
+                          <span className={`font-bold text-lg whitespace-nowrap ${tx.amount > 0 ? 'amount-positive' : 'amount-negative'}`}>
+                            {tx.amount > 0 ? '+' : ''}{formatCurrency(tx.amount)}
+                          </span>
+                        </div>
+                        
+                        {tx.merchant && (
+                          <p className="text-sm text-muted-foreground mb-2">{tx.merchant}</p>
+                        )}
+
+                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                          <Tag style={{ backgroundColor: `${catInfo.color}15`, color: catInfo.color, border: 'none', fontSize: '11px' }}>
+                            {catInfo.nameRu}
+                          </Tag>
+                          <Tag color={statusColors[tx.status]} style={{ fontSize: '11px' }}>
+                            {statusLabels[tx.status]}
+                          </Tag>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>{account?.name}</span>
+                          <span>{formatDate(tx.date)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Операции не найдены
+              </div>
+            )}
+            
+            {filteredTransactions.length > 20 && (
+              <div className="text-center py-4 text-sm text-muted-foreground">
+                Показано 20 из {filteredTransactions.length} операций
+              </div>
+            )}
+          </div>
         </Card>
       </div>
 

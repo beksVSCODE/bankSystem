@@ -305,22 +305,6 @@ export default function Payments() {
             </div>
             <div className="flex items-center gap-3">
               <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                size="large"
-                className="hidden sm:flex font-semibold"
-                style={{ background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)' }}
-              >
-                Новая операция
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                size="large"
-                className="sm:hidden"
-                style={{ background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)' }}
-              />
-              <Button
                 type="text"
                 icon={<MenuOutlined />}
                 size="large"

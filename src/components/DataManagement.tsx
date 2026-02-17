@@ -27,21 +27,25 @@ export const DataManagement = () => {
 
   return (
     <Card
-      title={
-        <span className="flex items-center gap-2">
-          <DatabaseOutlined /> Управление данными
-        </span>
-      }
-      extra={
+    title={
+        <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 mt-[20px]">
+            <DatabaseOutlined />
+            <span >Управление данными</span>
+        </div>
+
         <Button
-          danger
-          icon={<DeleteOutlined />}
-          onClick={handleReset}
+            danger
+            icon={<DeleteOutlined />}
+            onClick={handleReset}
+            className="w-fit"
         >
-          Сбросить данные
+            Сбросить данные
         </Button>
-      }
+        </div>
+    }
     >
+
       <Row gutter={[12, 16]} className="mb-4">
         <Col xs={24} sm={12} lg={8}>
           <Statistic

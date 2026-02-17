@@ -278,22 +278,7 @@ export default function Reports() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                size="large"
-                className="hidden sm:flex font-semibold"
-                style={{ background: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)' }}
-              >
-                Новый отчет
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                size="large"
-                className="sm:hidden"
-                style={{ background: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)' }}
-              />
+
               <Button
                 type="text"
                 icon={<MenuOutlined />}

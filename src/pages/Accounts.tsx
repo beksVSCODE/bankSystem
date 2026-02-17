@@ -302,8 +302,8 @@ const Accounts = () => {
           </Card>
         </div>
 
-        {/* Accounts Table */}
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-modern" bordered={false}>
+        {/* Accounts Table - Desktop */}
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-modern hidden md:block" bordered={false}>
           <Table
             columns={columns}
             dataSource={accounts}
@@ -312,6 +312,79 @@ const Accounts = () => {
             className="bank-table"
           />
         </Card>
+
+        {/* Accounts List - Mobile */}
+        <div className="md:hidden space-y-3">
+          {accounts.map(account => {
+            const primaryCard = getPrimaryCard(account.id, cards);
+            return (
+              <Card
+                key={account.id}
+                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 card-modern"
+                bordered={false}
+                onClick={() => navigate(`/accounts/${account.id}`)}
+              >
+                <div className="space-y-4">
+                  {/* Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: `${account.color}15` }}
+                      >
+                        <span style={{ color: account.color }}>{getAccountIcon(account.accountType)}</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">{account.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {primaryCard?.cardNumber || `Счёт ••${account.accountNumber.slice(-4)}`}
+                        </p>
+                      </div>
+                    </div>
+                    <Dropdown menu={{ items: getDropdownItems(account) }} trigger={['click']}>
+                      <Button
+                        type="text"
+                        icon={<MoreOutlined />}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </Dropdown>
+                  </div>
+
+                  {/* Balance */}
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Баланс</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {showBalances ? formatCurrency(account.balance, account.currency) : '••••••'}
+                    </p>
+                  </div>
+
+                  {/* Info Tags */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Tag color="blue">{getAccountTypeLabel(account.accountType)}</Tag>
+                    <Tag>{account.currency}</Tag>
+                    <Tag color={account.isActive ? 'green' : 'red'}>
+                      {account.isActive ? 'Активен' : 'Заблокирован'}
+                    </Tag>
+                  </div>
+
+                  {/* Actions */}
+                  <Button
+                    type="primary"
+                    icon={<SendOutlined />}
+                    block
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedAccount(account);
+                      setTransferOpen(true);
+                    }}
+                  >
+                    Перевод
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       </div>
 
       {/* Modals */}
